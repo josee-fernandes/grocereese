@@ -225,9 +225,15 @@ const Home: NextPage = () => {
       </nav>
       <main className="mx-auto max-w-[1200px] w-full px-4 mt-10">
         <div className="flex justify-between items-center gap-4 flex-col md:flex-row">
-          <h2 className="text-xl font-bold text-center">Lista de compras</h2>
+          <div className="flex items-center gap-2 flex-col md:flex-row">
+            <h2 className="text-xl font-bold text-center">Lista de compras</h2>
+            <Separator orientation="vertical" className="hidden h-6 md:block" />
+            <span className="text-sm text-muted-foreground font-semibold">
+              {new Intl.DateTimeFormat('pt-BR').format(new Date())}
+            </span>
+          </div>
           <div>
-            <p className="text-center">
+            <p className="text-center text-sm font-semibold md:text-right text-muted-foreground">
               {caughtItems.length} de {groceries.length} itens pegos, total de{' '}
               {new Intl.NumberFormat('pt-BR', {
                 style: 'currency',
