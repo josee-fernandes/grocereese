@@ -18,6 +18,7 @@ import {
 import { Portal } from '../portal'
 import { useCallback } from 'react'
 import { destroy } from '@/utils/local'
+import { toast } from 'sonner'
 
 interface DeleteGroceryItemDialogProps {
   isOpen: boolean
@@ -42,6 +43,10 @@ export const DeleteGroceryItemDialog: React.FC<
       setGroceries((oldGroceries) =>
         oldGroceries.filter((item) => item.id !== groceryItemId),
       )
+
+      toast.success('Sucesso!', {
+        description: `Item removido da lista com sucesso!`,
+      })
     } catch (error) {
       console.error(error)
     }

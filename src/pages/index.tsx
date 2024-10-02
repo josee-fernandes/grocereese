@@ -12,6 +12,7 @@ import { Check, Pencil, PencilOff, ShoppingCart, Trash } from 'lucide-react'
 import { NextPage } from 'next'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
 
@@ -52,6 +53,7 @@ const Home: NextPage = () => {
   const [groceries, setGroceries] = useState<Groceries>([])
   const [isCreatingItem, setIsCreatingItem] = useState(false)
   const [editingItemId, setEditingItemId] = useState('')
+  const [deletingItemId, setDeletingItemId] = useState('')
   const [isDeleteGroceryItemDialogOpen, setIsDeleteGroceryItemDialogOpen] =
     useState(false)
 
@@ -183,6 +185,10 @@ const Home: NextPage = () => {
 
       handleCancelEditItem()
       resetUpdate()
+
+      toast.success('Sucesso!', {
+        description: `Item atualizado com sucesso!`,
+      })
     } catch (error) {
       console.error(error)
     }
@@ -192,9 +198,10 @@ const Home: NextPage = () => {
     setIsDeleteGroceryItemDialogOpen(isOpen)
   }
 
-  const handleOpenDeleteGroceryItemDialog = () => {
+  const handleOpenDeleteGroceryItemDialog = (id: string) => {
     try {
       setIsDeleteGroceryItemDialogOpen(true)
+      setDeletingItemId(id)
     } catch (error) {
       console.error(error)
     }
@@ -378,16 +385,20 @@ const Home: NextPage = () => {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={handleOpenDeleteGroceryItemDialog}
+                        onClick={() =>
+                          handleOpenDeleteGroceryItemDialog(item.id)
+                        }
                       >
                         <Trash className="size-4" />
                       </Button>
-                      <DeleteGroceryItemDialog
-                        isOpen={isDeleteGroceryItemDialogOpen}
-                        groceryItemId={item.id}
-                        setGroceries={setGroceries}
-                        onOpenChange={updateDeleteGroceryItemDialogOpen}
-                      />
+                      {deletingItemId === item.id && (
+                        <DeleteGroceryItemDialog
+                          isOpen={isDeleteGroceryItemDialogOpen}
+                          groceryItemId={item.id}
+                          setGroceries={setGroceries}
+                          onOpenChange={updateDeleteGroceryItemDialogOpen}
+                        />
+                      )}
                     </>
                   )}
                 </div>
