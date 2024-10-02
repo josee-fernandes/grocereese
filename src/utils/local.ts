@@ -44,3 +44,13 @@ export const save = async <T = any>(key: string, data: T) => {
 
   return data
 }
+
+export const destroy = async <T = any>(key: string, id: string) => {
+  const items = await getAll<T>(key)
+
+  if (Array.isArray(items)) {
+    const updatedItems = items.filter((item) => item.id !== id)
+
+    localStorage.setItem(key, JSON.stringify(updatedItems))
+  }
+}

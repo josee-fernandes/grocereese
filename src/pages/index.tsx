@@ -1,3 +1,4 @@
+import { DeleteGroceryItemDialog } from '@/components/groceries/delete-grocery-item-dialog'
 import { NoGroceriesFallback } from '@/components/groceries/no-groceries-fallback'
 import { ThemeToggler } from '@/components/theme-toggler'
 import { Button } from '@/components/ui/button'
@@ -7,24 +8,12 @@ import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { getAll, save } from '@/utils/local'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, Pencil, PencilOff, ShoppingCart } from 'lucide-react'
+import { Check, Pencil, PencilOff, ShoppingCart, Trash } from 'lucide-react'
 import { NextPage } from 'next'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
-
-interface GroceryItem {
-  id: string
-  name: string
-  price: number
-  quantity: number
-  caught: boolean
-  createdAt: Date
-  updatedAt: Date
-}
-
-type Groceries = GroceryItem[]
 
 const createItemFormSchema = z.object({
   name: z.string().min(1),
@@ -61,10 +50,10 @@ const Home: NextPage = () => {
   })
 
   const [groceries, setGroceries] = useState<Groceries>([])
-
   const [isCreatingItem, setIsCreatingItem] = useState(false)
-
   const [editingItemId, setEditingItemId] = useState('')
+  const [isDeleteGroceryItemDialogOpen, setIsDeleteGroceryItemDialogOpen] =
+    useState(false)
 
   const editingItem = useMemo(
     () => groceries.find((item) => item.id === editingItemId) ?? null,
@@ -194,6 +183,18 @@ const Home: NextPage = () => {
 
       handleCancelEditItem()
       resetUpdate()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const updateDeleteGroceryItemDialogOpen = (isOpen: boolean) => {
+    setIsDeleteGroceryItemDialogOpen(isOpen)
+  }
+
+  const handleOpenDeleteGroceryItemDialog = () => {
+    try {
+      setIsDeleteGroceryItemDialogOpen(true)
     } catch (error) {
       console.error(error)
     }
@@ -374,6 +375,19 @@ const Home: NextPage = () => {
                       >
                         <Pencil className="size-4" />
                       </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleOpenDeleteGroceryItemDialog}
+                      >
+                        <Trash className="size-4" />
+                      </Button>
+                      <DeleteGroceryItemDialog
+                        isOpen={isDeleteGroceryItemDialogOpen}
+                        groceryItemId={item.id}
+                        setGroceries={setGroceries}
+                        onOpenChange={updateDeleteGroceryItemDialogOpen}
+                      />
                     </>
                   )}
                 </div>
