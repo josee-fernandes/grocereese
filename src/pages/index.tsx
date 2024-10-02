@@ -2,9 +2,10 @@ import { ThemeToggler } from '@/components/theme-toggler'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Pen, ShoppingCart } from 'lucide-react'
+import { Check, Pencil, PencilOff, ShoppingCart } from 'lucide-react'
 import { NextPage } from 'next'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -62,6 +63,20 @@ const createItemFormSchema = z.object({
 
 type CreateItemFormData = z.infer<typeof createItemFormSchema>
 
+const updateItemFormSchema = z.object({
+  name: z.string().min(1),
+  price: z
+    .string()
+    .min(0)
+    .transform((value) => Number(value)),
+  quantity: z
+    .string()
+    .min(0)
+    .transform((value) => Number(value)),
+})
+
+type UpdateItemFormData = z.infer<typeof updateItemFormSchema>
+
 const Home: NextPage = () => {
   const { register, handleSubmit, reset } = useForm<CreateItemFormData>({
     defaultValues: {
@@ -77,15 +92,36 @@ const Home: NextPage = () => {
 
   const [isCreatingItem, setIsCreatingItem] = useState(false)
 
+  const [editingItemId, setEditingItemId] = useState('')
+
+  const editingItem = useMemo(
+    () => groceries.find((item) => item.id === editingItemId) ?? null,
+    [groceries, editingItemId],
+  )
+
+  const {
+    register: registerUpdate,
+    handleSubmit: handleSubmitUpdate,
+    reset: resetUpdate,
+  } = useForm<UpdateItemFormData>({
+    values: {
+      name: editingItem?.name ?? '',
+      price: editingItem?.price ?? 0,
+      quantity: editingItem?.quantity ?? 0,
+    },
+    resolver: zodResolver(updateItemFormSchema),
+  })
+
   const caughtItems = useMemo(
     () => groceries.filter((item) => item.caught) ?? [],
     [groceries],
   )
   const total = useMemo(
     () =>
-      caughtItems
-        .reduce((total, item) => total + item.price * item.quantity, 0)
-        .toFixed(2) ?? 0,
+      caughtItems.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0,
+      ) ?? 0,
     [caughtItems],
   )
 
@@ -128,13 +164,47 @@ const Home: NextPage = () => {
     }
   }
 
-  const handleUpdateItem = (id: string) => {
+  const handleToggleCaughtItem = (id: string) => {
     try {
       setGroceries((oldGroceries) =>
         oldGroceries.map((grocery) =>
           grocery.id === id ? { ...grocery, caught: !grocery.caught } : grocery,
         ),
       )
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const handleEditItem = (id: string) => {
+    setEditingItemId(id)
+  }
+
+  const handleCancelEditItem = () => {
+    setEditingItemId('')
+  }
+
+  const handleUpdateItem = (data: UpdateItemFormData) => {
+    try {
+      console.log('update item')
+
+      const updatedItem = {
+        name: data.name,
+        price: data.price,
+        quantity: data.quantity,
+        updatedAt: new Date(),
+      }
+
+      console.log(updatedItem)
+
+      setGroceries((oldGroceries) =>
+        oldGroceries.map((item) =>
+          item.id === editingItemId ? { ...item, ...updatedItem } : item,
+        ),
+      )
+
+      handleCancelEditItem()
+      resetUpdate()
     } catch (error) {
       console.error(error)
     }
@@ -158,9 +228,11 @@ const Home: NextPage = () => {
           <h2 className="text-xl font-bold text-center">Lista de compras</h2>
           <div>
             <p className="text-center">
-              {caughtItems.length} de {groceries.length} itens pegos, total de
-              R$
-              {total}
+              {caughtItems.length} de {groceries.length} itens pegos, total de{' '}
+              {new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              }).format(total)}
             </p>
           </div>
         </div>
@@ -199,57 +271,120 @@ const Home: NextPage = () => {
               </div>
             </form>
           )}
-          {groceries.map((item) => (
-            <div
-              key={item.id}
-              className={cn(
-                'flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row',
-                item.caught &&
-                  item.price > 0 &&
-                  item.quantity > 0 &&
-                  'text-emerald-500',
-                item.caught &&
-                  (item.price === 0 || item.quantity === 0) &&
-                  'text-amber-500',
-              )}
-            >
-              <div className="flex items-center gap-4 flex-1">
-                <Checkbox
-                  id={item.id}
-                  className={cn(
-                    item.caught &&
-                      item.price > 0 &&
-                      item.quantity > 0 &&
-                      'data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500',
-                    item.caught &&
-                      item.price === 0 &&
-                      'data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500',
-                  )}
-                  defaultChecked={item.caught}
-                  onClick={() => handleUpdateItem(item.id)}
-                />
-                <label
-                  htmlFor={item.id}
-                  className={cn('font-semibold', item.caught && 'line-through')}
-                >
-                  {item.name}
-                </label>
-              </div>
-              <div className="flex items-center gap-8 justify-between max-w-[300px] w-full">
-                <div className="flex items-center gap-4 flex-1 flex-wrap text-center md:text-left">
-                  <span className="text-xs flex-1">
-                    R$ {item.price.toFixed(2)}
-                  </span>
-                  <span className="text-xs flex-1">
-                    {item.quantity} unidades
-                  </span>
+          {groceries.map((item) => {
+            const isEditing = item.id === editingItemId
+
+            return (
+              <div
+                key={item.id}
+                className={cn(
+                  'flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row',
+                  item.caught &&
+                    item.price > 0 &&
+                    item.quantity > 0 &&
+                    'text-emerald-500',
+                  item.caught &&
+                    (item.price === 0 || item.quantity === 0) &&
+                    'text-amber-500',
+                )}
+              >
+                <div className="flex items-center gap-4 flex-1">
+                  <Checkbox
+                    id={item.id}
+                    className={cn(
+                      item.caught &&
+                        item.price > 0 &&
+                        item.quantity > 0 &&
+                        'data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500',
+                      item.caught &&
+                        (item.price === 0 || item.quantity === 0) &&
+                        'data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500',
+                    )}
+                    defaultChecked={item.caught}
+                    onClick={() => handleToggleCaughtItem(item.id)}
+                  />
+                  <label
+                    htmlFor={item.id}
+                    className={cn(
+                      'font-semibold',
+                      item.caught && 'line-through',
+                    )}
+                  >
+                    {item.name}
+                  </label>
                 </div>
-                <Button variant="outline" size="icon">
-                  <Pen className="size-4" />
-                </Button>
+                <div className="flex items-center gap-4 justify-between max-w-96">
+                  {isEditing ? (
+                    <form
+                      className="flex items-center gap-4"
+                      onSubmit={handleSubmitUpdate(handleUpdateItem)}
+                    >
+                      <div className="flex items-center gap-4 flex-1 flex-wrap text-center md:text-left">
+                        <div className="text-xs flex items-center gap-2">
+                          R$
+                          <Input
+                            placeholder="Preço"
+                            type="number"
+                            min={0}
+                            max={99}
+                            step={0.01}
+                            className="w-14"
+                            {...registerUpdate('price')}
+                          />
+                        </div>
+                        <Separator orientation="vertical" className="h-4" />
+                        <div className="text-xs flex items-center gap-2">
+                          <Input
+                            placeholder="Preço"
+                            type="number"
+                            min={0}
+                            max={99}
+                            className="w-14"
+                            {...registerUpdate('quantity')}
+                          />
+                          unidades
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button type="submit" variant="outline" size="icon">
+                          <Check className="size-4" />
+                        </Button>
+                        <Button
+                          type="reset"
+                          variant="outline"
+                          size="icon"
+                          onClick={handleCancelEditItem}
+                        >
+                          <PencilOff className="size-4" />
+                        </Button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-4 flex-1 flex-wrap text-center md:text-left">
+                        <div className="flex items-center gap-4 mr-12">
+                          <span className="text-xs">
+                            R$ {item.price.toFixed(2)}
+                          </span>
+                          <Separator orientation="vertical" className="h-4" />
+                          <span className="text-xs">
+                            {item.quantity} unidades
+                          </span>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleEditItem(item.id)}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </main>
     </div>
