@@ -289,6 +289,7 @@ const Home: NextPage = () => {
                   item.caught &&
                     (item.price === 0 || item.quantity === 0) &&
                     'text-amber-500',
+                  isEditing && 'border-sky-500',
                 )}
               >
                 <div className="flex items-center gap-4 flex-1">
@@ -306,15 +307,22 @@ const Home: NextPage = () => {
                     defaultChecked={item.caught}
                     onClick={() => handleToggleCaughtItem(item.id)}
                   />
-                  <label
-                    htmlFor={item.id}
-                    className={cn(
-                      'font-semibold',
-                      item.caught && 'line-through',
-                    )}
-                  >
-                    {item.name}
-                  </label>
+                  {isEditing ? (
+                    <Input
+                      placeholder="Nome do item da compra"
+                      {...registerUpdate('name')}
+                    />
+                  ) : (
+                    <label
+                      htmlFor={item.id}
+                      className={cn(
+                        'font-semibold',
+                        item.caught && 'line-through',
+                      )}
+                    >
+                      {item.name}
+                    </label>
+                  )}
                 </div>
                 <div className="flex items-center gap-4 justify-between max-w-96">
                   {isEditing ? (
