@@ -4,6 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
+import { getAll, save } from '@/utils/local'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Pencil, PencilOff, ShoppingCart } from 'lucide-react'
 import { NextPage } from 'next'
@@ -12,7 +13,7 @@ import { useForm } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
 
-interface Grocery {
+interface GroceryItem {
   id: string
   name: string
   price: number
@@ -22,37 +23,7 @@ interface Grocery {
   updatedAt: Date
 }
 
-type Groceries = Grocery[]
-
-const data: Groceries = [
-  {
-    id: uuidv4(),
-    name: 'Item 1',
-    price: 0.0,
-    quantity: 0,
-    caught: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: uuidv4(),
-    name: 'Item 2',
-    price: 10.0,
-    quantity: 2,
-    caught: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: uuidv4(),
-    name: 'Item 3',
-    price: 5.25,
-    quantity: 4,
-    caught: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-]
+type Groceries = GroceryItem[]
 
 const createItemFormSchema = z.object({
   name: z.string().min(1),
@@ -127,7 +98,9 @@ const Home: NextPage = () => {
 
   const loadGroceries = useCallback(async () => {
     try {
-      setGroceries(data)
+      const response = await getAll<Groceries>('groceries')
+
+      setGroceries(response)
     } catch (error) {
       console.error(error)
     }
@@ -142,9 +115,9 @@ const Home: NextPage = () => {
     reset()
   }, [reset])
 
-  const createItem = (data: CreateItemFormData) => {
+  const createItem = async (data: CreateItemFormData) => {
     try {
-      const item = {
+      const item: GroceryItem = {
         id: uuidv4(),
         name: data.name,
         price: data.price,
@@ -154,7 +127,7 @@ const Home: NextPage = () => {
         updatedAt: new Date(),
       }
 
-      console.log(item)
+      await save<GroceryItem>('groceries', item)
 
       setGroceries((oldGroceries) => [...oldGroceries, item])
 
@@ -164,11 +137,23 @@ const Home: NextPage = () => {
     }
   }
 
-  const handleToggleCaughtItem = (id: string) => {
+  const handleToggleCaughtItem = async (id: string) => {
     try {
+      const groceryItem = groceries.find((item) => item.id === id)
+
+      if (!groceryItem) throw new Error('Grocery item not found')
+
+      const updatedItem: GroceryItem = {
+        ...groceryItem,
+        caught: !groceryItem.caught,
+        updatedAt: new Date(),
+      }
+
+      await save<GroceryItem>('groceries', updatedItem)
+
       setGroceries((oldGroceries) =>
         oldGroceries.map((grocery) =>
-          grocery.id === id ? { ...grocery, caught: !grocery.caught } : grocery,
+          grocery.id === id ? updatedItem : grocery,
         ),
       )
     } catch (error) {
@@ -184,22 +169,25 @@ const Home: NextPage = () => {
     setEditingItemId('')
   }
 
-  const handleUpdateItem = (data: UpdateItemFormData) => {
+  const handleUpdateItem = async (data: UpdateItemFormData) => {
     try {
-      console.log('update item')
+      if (!editingItem) throw new Error('Editing item not found')
 
-      const updatedItem = {
+      const updatedItem: GroceryItem = {
+        id: editingItem.id,
         name: data.name,
         price: data.price,
         quantity: data.quantity,
+        caught: editingItem.caught,
+        createdAt: editingItem.createdAt,
         updatedAt: new Date(),
       }
 
-      console.log(updatedItem)
+      await save<GroceryItem>('groceries', updatedItem)
 
       setGroceries((oldGroceries) =>
         oldGroceries.map((item) =>
-          item.id === editingItemId ? { ...item, ...updatedItem } : item,
+          item.id === editingItemId ? updatedItem : item,
         ),
       )
 
