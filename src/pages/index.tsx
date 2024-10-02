@@ -1,3 +1,4 @@
+import { NoGroceriesFallback } from '@/components/groceries/no-groceries-fallback'
 import { ThemeToggler } from '@/components/theme-toggler'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -211,7 +212,7 @@ const Home: NextPage = () => {
         </div>
         <ThemeToggler />
       </nav>
-      <main className="mx-auto max-w-[1200px] w-full px-4 mt-10">
+      <main className="mx-auto max-w-[1200px] w-full px-4 py-10">
         <div className="flex justify-between items-center gap-4 flex-col md:flex-row">
           <div className="flex items-center gap-2 flex-col md:flex-row">
             <h2 className="text-xl font-bold text-center">Lista de compras</h2>
@@ -379,6 +380,7 @@ const Home: NextPage = () => {
               </div>
             )
           })}
+          {groceries.length === 0 && <NoGroceriesFallback />}
         </div>
       </main>
     </div>
