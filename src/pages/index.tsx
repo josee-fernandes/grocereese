@@ -1,6 +1,6 @@
 import { DeleteGroceryItemDialog } from '@/components/groceries/delete-grocery-item-dialog'
 import { NoGroceriesFallback } from '@/components/groceries/no-groceries-fallback'
-import { ThemeToggler } from '@/components/theme-toggler'
+import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -8,7 +8,7 @@ import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { getAll, save } from '@/utils/local'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, Pencil, PencilOff, ShoppingCart, Trash } from 'lucide-react'
+import { Check, Pencil, PencilOff, Trash } from 'lucide-react'
 import { NextPage } from 'next'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -115,6 +115,7 @@ const Home: NextPage = () => {
         price: data.price,
         quantity: data.quantity,
         caught: data.caught,
+        listId: '',
         createdAt: new Date(),
         updatedAt: new Date(),
       }
@@ -171,6 +172,7 @@ const Home: NextPage = () => {
         price: data.price,
         quantity: data.quantity,
         caught: editingItem.caught,
+        listId: editingItem.listId,
         createdAt: editingItem.createdAt,
         updatedAt: new Date(),
       }
@@ -213,13 +215,7 @@ const Home: NextPage = () => {
 
   return (
     <div>
-      <nav className="flex items-center justify-between gap-4 p-4 border-b">
-        <div className="font-bold flex items-center gap-2">
-          <ShoppingCart className="size-4" />
-          <span className="text-lg font-bold leading-none">Grocereese</span>
-        </div>
-        <ThemeToggler />
-      </nav>
+      <Navbar />
       <main className="mx-auto max-w-[1200px] w-full px-4 py-10">
         <div className="flex justify-between items-center gap-4 flex-col md:flex-row">
           <div className="flex items-center gap-2 flex-col md:flex-row">

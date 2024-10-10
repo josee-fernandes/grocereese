@@ -4,6 +4,7 @@ interface GroceryItem {
   price: number
   quantity: number
   caught: boolean
+  listId: string
   createdAt: Date
   updatedAt: Date
 }
