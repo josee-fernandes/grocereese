@@ -262,10 +262,10 @@ const ListPage: NextPage = () => {
 
   useEffect(() => {
     if (listId) {
-      checkForGroceriesWithoutAList(listId.toString())
-
-      loadList(listId.toString())
-      loadGroceries(listId.toString())
+      checkForGroceriesWithoutAList(listId.toString()).then(() => {
+        loadList(listId.toString())
+        loadGroceries(listId.toString())
+      })
     }
   }, [loadList, loadGroceries, listId])
 
