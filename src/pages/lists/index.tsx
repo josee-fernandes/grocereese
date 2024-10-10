@@ -173,7 +173,7 @@ const ListsPage: NextPage = () => {
   return (
     <div>
       <Navbar />
-      <main className="mx-auto max-w-[1200px] w-full px-4 py-10">
+      <main className="mx-auto max-w-[1200px] w-full px-4 md:px-6 py-10">
         <div className="flex justify-between items-center gap-4 flex-col md:flex-row flex-wrap">
           <div className="flex items-center gap-2 flex-col md:flex-row flex-wrap">
             <h2 className="text-xl font-bold text-center">Listas de compras</h2>
@@ -228,11 +228,15 @@ const ListsPage: NextPage = () => {
                   isEditing && 'border-sky-500',
                 )}
                 onClick={() => handleRedirectToList(list.id)}
+                // onClick={(event) => {
+                //   console.log('item clicado', event)
+                // }}
               >
                 <div className="flex items-center gap-4 flex-1">
                   {isEditing ? (
                     <Input
                       placeholder="Nome do item da compra"
+                      onClick={(event) => event.stopPropagation()}
                       onMouseEnter={handleActionMouseEnter}
                       onMouseLeave={handleActionMouseLeave}
                       {...registerUpdate('name')}
@@ -255,6 +259,11 @@ const ListsPage: NextPage = () => {
                         size="icon"
                         onMouseEnter={handleActionMouseEnter}
                         onMouseLeave={handleActionMouseLeave}
+                        onClick={(event) => {
+                          event.stopPropagation()
+
+                          handleActionMouseLeave()
+                        }}
                       >
                         <Check className="size-4" />
                       </Button>
@@ -262,7 +271,11 @@ const ListsPage: NextPage = () => {
                         type="reset"
                         variant="outline"
                         size="icon"
-                        onClick={handleCancelEditList}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          handleCancelEditList()
+                          handleActionMouseLeave()
+                        }}
                         onMouseEnter={handleActionMouseEnter}
                         onMouseLeave={handleActionMouseLeave}
                       >
@@ -274,7 +287,11 @@ const ListsPage: NextPage = () => {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => handleEditList(list.id)}
+                        onClick={(event) => {
+                          event.stopPropagation()
+
+                          handleEditList(list.id)
+                        }}
                         onMouseEnter={handleActionMouseEnter}
                         onMouseLeave={handleActionMouseLeave}
                       >
@@ -283,7 +300,9 @@ const ListsPage: NextPage = () => {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => {
+                        onClick={(event) => {
+                          event.stopPropagation()
+
                           handleOpenDeleteListDialog(list.id)
                         }}
                         onMouseEnter={handleActionMouseEnter}

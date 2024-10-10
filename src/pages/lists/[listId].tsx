@@ -258,7 +258,7 @@ const ListPage: NextPage = () => {
   return (
     <div>
       <Navbar />
-      <main className="mx-auto max-w-[1200px] w-full px-4 py-10">
+      <main className="mx-auto max-w-[1200px] w-full px-4 md:px-6 py-10">
         <div className="flex justify-between items-center gap-4 flex-col md:flex-row flex-wrap md:flex-nowrap">
           <div className="flex items-center gap-2 flex-col md:flex-row w-full flex-wrap">
             <Button

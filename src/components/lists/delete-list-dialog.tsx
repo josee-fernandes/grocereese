@@ -11,6 +11,7 @@ import {
 import {
   Drawer,
   DrawerContent,
+  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -89,6 +90,10 @@ export const DeleteListDialog: React.FC<DeleteListDialogProps> = ({
         <DrawerContent>
           <DrawerHeader className="text-left">
             <DrawerTitle>Remover lista</DrawerTitle>
+            <DrawerDescription className="sr-only">
+              Você realmente quer deletar esta lista? Esta ação não pode ser
+              desfeita.
+            </DrawerDescription>
           </DrawerHeader>
           <p className="p-4">
             Você realmente quer remover esta lista? Esta ação não pode ser

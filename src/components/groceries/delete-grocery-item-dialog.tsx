@@ -11,6 +11,7 @@ import {
 import {
   Drawer,
   DrawerContent,
+  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -88,6 +89,10 @@ export const DeleteGroceryItemDialog: React.FC<
         <DrawerContent>
           <DrawerHeader className="text-left">
             <DrawerTitle>Remover item</DrawerTitle>
+            <DrawerDescription className="sr-only">
+              Você realmente quer deletar este item das compras? Esta ação não
+              pode ser desfeita.
+            </DrawerDescription>
           </DrawerHeader>
           <p className="p-4">
             Você realmente quer remover este item das compras? Esta ação não
