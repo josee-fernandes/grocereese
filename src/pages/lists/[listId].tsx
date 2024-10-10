@@ -6,11 +6,12 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
-import { getAll, save } from '@/utils/local'
+import { getAll, getById, save } from '@/utils/local'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, Pencil, PencilOff, Trash } from 'lucide-react'
+import { ArrowLeft, Check, Pencil, PencilOff, Trash } from 'lucide-react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
+import { useRouter as useNavigation } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -43,6 +44,7 @@ type UpdateItemFormData = z.infer<typeof updateItemFormSchema>
 const ListPage: NextPage = () => {
   const router = useRouter()
   const { listId } = router.query
+  const navigationRouter = useNavigation()
 
   console.log({ listId })
 
@@ -56,6 +58,7 @@ const ListPage: NextPage = () => {
     resolver: zodResolver(createItemFormSchema),
   })
 
+  const [list, setList] = useState<List | null>(null)
   const [groceries, setGroceries] = useState<Groceries>([])
   const [isCreatingItem, setIsCreatingItem] = useState(false)
   const [editingItemId, setEditingItemId] = useState('')
@@ -93,6 +96,16 @@ const ListPage: NextPage = () => {
       ) ?? 0,
     [caughtItems],
   )
+
+  const loadList = useCallback(async (id: string) => {
+    try {
+      const response = await getById<List>('lists', id)
+
+      setList(response)
+    } catch (error) {
+      console.error(error)
+    }
+  }, [])
 
   const loadGroceries = useCallback(async (listId: string) => {
     try {
@@ -178,6 +191,8 @@ const ListPage: NextPage = () => {
     try {
       if (!editingItem) throw new Error('Editing item not found')
 
+      if (!list) throw new Error('List for current item not found')
+
       const updatedItem: GroceryItem = {
         id: editingItem.id,
         name: data.name,
@@ -189,7 +204,15 @@ const ListPage: NextPage = () => {
         updatedAt: new Date(),
       }
 
+      const updatedList: List = {
+        id: list.id,
+        name: list.name,
+        createdAt: list.createdAt,
+        updatedAt: new Date(),
+      }
+
       await save<GroceryItem>('groceries', updatedItem)
+      await save<List>('lists', updatedList)
 
       setGroceries((oldGroceries) =>
         oldGroceries.map((item) =>
@@ -221,24 +244,51 @@ const ListPage: NextPage = () => {
     }
   }
 
+  const handleBackToLists = useCallback(() => {
+    navigationRouter.push('/lists')
+  }, [navigationRouter])
+
   useEffect(() => {
-    if (listId) loadGroceries(listId.toString())
-  }, [loadGroceries, listId])
+    if (listId) {
+      loadList(listId.toString())
+      loadGroceries(listId.toString())
+    }
+  }, [loadList, loadGroceries, listId])
 
   return (
     <div>
       <Navbar />
       <main className="mx-auto max-w-[1200px] w-full px-4 py-10">
-        <div className="flex justify-between items-center gap-4 flex-col md:flex-row">
-          <div className="flex items-center gap-2 flex-col md:flex-row">
-            <h2 className="text-xl font-bold text-center">Lista de compras</h2>
-            <Separator orientation="vertical" className="hidden h-6 md:block" />
-            <span className="text-sm text-muted-foreground font-semibold">
-              {new Intl.DateTimeFormat('pt-BR').format(new Date())}
-            </span>
+        <div className="flex justify-between items-center gap-4 flex-col md:flex-row flex-wrap md:flex-nowrap">
+          <div className="flex items-center gap-2 flex-col md:flex-row w-full flex-wrap">
+            <Button
+              variant="outline"
+              size="icon"
+              className="self-start"
+              onClick={handleBackToLists}
+            >
+              <span className="sr-only">Voltar</span>
+              <ArrowLeft className="size-4" />
+            </Button>
+            <div className="flex items-center gap-2 flex-col md:flex-row flex-wrap">
+              <h2 className="text-xl font-bold text-center">
+                {list?.name ?? 'Lista de compras'}
+              </h2>
+              <Separator
+                orientation="vertical"
+                className="hidden h-6 md:block"
+              />
+              <p className="text-xs text-muted-foreground font-semibold flex items-center gap-1 leading-none flex-wrap flex-col md:flex-row">
+                <span className="text-[0.625rem]">ÚLTIMA ATUALIZAÇÃO:</span>
+                {list &&
+                  new Intl.DateTimeFormat('pt-BR').format(
+                    new Date(list?.updatedAt),
+                  )}
+              </p>
+            </div>
           </div>
           <div>
-            <p className="text-center text-sm font-semibold md:text-right text-muted-foreground">
+            <p className="text-center text-sm font-semibold md:text-right text-muted-foreground md:w-max">
               {caughtItems.length} de {groceries.length} itens pegos, total de{' '}
               {new Intl.NumberFormat('pt-BR', {
                 style: 'currency',
@@ -247,7 +297,7 @@ const ListPage: NextPage = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col gap-2 mt-6">
+        <div className="flex flex-col gap-2 mt-6 flex-wrap">
           {!isCreatingItem && (
             <Button
               variant="outline"
@@ -267,7 +317,7 @@ const ListPage: NextPage = () => {
                 className="border-none"
                 {...register('name')}
               />
-              <div className="flex items-center gap-2 flex-1">
+              <div className="flex items-center gap-2 flex-1 flex-wrap">
                 <Button type="submit" className="flex-1">
                   Adicionar
                 </Button>
@@ -289,7 +339,7 @@ const ListPage: NextPage = () => {
               <div
                 key={item.id}
                 className={cn(
-                  'flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row',
+                  'flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row flex-wrap',
                   item.caught &&
                     item.price > 0 &&
                     item.quantity > 0 &&
@@ -300,7 +350,7 @@ const ListPage: NextPage = () => {
                   isEditing && 'border-sky-500',
                 )}
               >
-                <div className="flex items-center gap-4 flex-1">
+                <div className="flex items-center gap-4 flex-1 flex-wrap">
                   <Checkbox
                     id={item.id}
                     className={cn(
@@ -332,14 +382,14 @@ const ListPage: NextPage = () => {
                     </label>
                   )}
                 </div>
-                <div className="flex items-center gap-4 justify-between max-w-96">
+                <div className="flex items-center gap-4 justify-between max-w-96 flex-wrap">
                   {isEditing ? (
                     <form
-                      className="flex items-center gap-4"
+                      className="flex items-center gap-4 flex-wrap"
                       onSubmit={handleSubmitUpdate(handleUpdateItem)}
                     >
                       <div className="flex items-center gap-4 flex-1 flex-wrap text-center md:text-left">
-                        <div className="text-xs flex items-center gap-2">
+                        <div className="text-xs flex items-center gap-2 flex-wrap">
                           R$
                           <Input
                             placeholder="Preço"
@@ -352,7 +402,7 @@ const ListPage: NextPage = () => {
                           />
                         </div>
                         <Separator orientation="vertical" className="h-4" />
-                        <div className="text-xs flex items-center gap-2">
+                        <div className="text-xs flex items-center gap-2 flex-wrap">
                           <Input
                             placeholder="Preço"
                             type="number"
@@ -364,7 +414,7 @@ const ListPage: NextPage = () => {
                           unidades
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <Button type="submit" variant="outline" size="icon">
                           <Check className="size-4" />
                         </Button>
@@ -381,7 +431,7 @@ const ListPage: NextPage = () => {
                   ) : (
                     <>
                       <div className="flex items-center gap-4 flex-1 flex-wrap text-center md:text-left">
-                        <div className="flex items-center gap-4 mr-12">
+                        <div className="flex items-center gap-4 mr-12 flex-wrap">
                           <span className="text-xs">
                             R$ {item.price.toFixed(2)}
                           </span>

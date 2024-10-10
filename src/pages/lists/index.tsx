@@ -174,13 +174,13 @@ const ListsPage: NextPage = () => {
     <div>
       <Navbar />
       <main className="mx-auto max-w-[1200px] w-full px-4 py-10">
-        <div className="flex justify-between items-center gap-4 flex-col md:flex-row">
-          <div className="flex items-center gap-2 flex-col md:flex-row">
+        <div className="flex justify-between items-center gap-4 flex-col md:flex-row flex-wrap">
+          <div className="flex items-center gap-2 flex-col md:flex-row flex-wrap">
             <h2 className="text-xl font-bold text-center">Listas de compras</h2>
           </div>
         </div>
         <div
-          className="flex flex-col gap-2 mt-6"
+          className="flex flex-col gap-2 mt-6 flex-wrap"
           onMouseEnter={handleActionMouseLeave}
         >
           {!isCreatingList && (
@@ -202,7 +202,7 @@ const ListsPage: NextPage = () => {
                 className="border-none"
                 {...register('name')}
               />
-              <div className="flex items-center gap-2 flex-1">
+              <div className="flex items-center gap-2 flex-1 flex-wrap">
                 <Button type="submit" className="flex-1">
                   Adicionar
                 </Button>
@@ -224,7 +224,7 @@ const ListsPage: NextPage = () => {
               <div
                 key={list.id}
                 className={cn(
-                  'flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row hover:bg-accent cursor-pointer transition-all',
+                  'flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row hover:bg-accent cursor-pointer transition-all flex-wrap',
                   isEditing && 'border-sky-500',
                 )}
                 onClick={() => handleRedirectToList(list.id)}
@@ -243,10 +243,10 @@ const ListsPage: NextPage = () => {
                     </label>
                   )}
                 </div>
-                <div className="flex items-center gap-4 justify-between max-w-96">
+                <div className="flex items-center gap-4 justify-between max-w-96 flex-wrap">
                   {isEditing ? (
                     <form
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 flex-wrap"
                       onSubmit={handleSubmitUpdate(handleUpdateList)}
                     >
                       <Button
