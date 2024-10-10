@@ -41,12 +41,24 @@ const updateItemFormSchema = z.object({
 
 type UpdateItemFormData = z.infer<typeof updateItemFormSchema>
 
+// Save groceries without a list to the first created list
+const checkForGroceriesWithoutAList = async (listId: string) => {
+  const groceries = await getAll<Groceries>('groceries')
+
+  for (const item of groceries) {
+    if (!item.listId) {
+      await save<GroceryItem>('groceries', {
+        ...item,
+        listId,
+      })
+    }
+  }
+}
+
 const ListPage: NextPage = () => {
   const router = useRouter()
   const { listId } = router.query
   const navigationRouter = useNavigation()
-
-  console.log({ listId })
 
   const { register, handleSubmit, reset } = useForm<CreateItemFormData>({
     defaultValues: {
@@ -250,6 +262,8 @@ const ListPage: NextPage = () => {
 
   useEffect(() => {
     if (listId) {
+      checkForGroceriesWithoutAList(listId.toString())
+
       loadList(listId.toString())
       loadGroceries(listId.toString())
     }
