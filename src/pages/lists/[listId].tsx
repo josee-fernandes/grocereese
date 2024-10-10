@@ -317,7 +317,7 @@ const ListPage: NextPage = () => {
                 className="border-none"
                 {...register('name')}
               />
-              <div className="flex items-center gap-2 flex-1 flex-wrap">
+              <div className="flex items-center gap-2 flex-1 flex-wrap md:flex-nowrap">
                 <Button type="submit" className="flex-1">
                   Adicionar
                 </Button>
