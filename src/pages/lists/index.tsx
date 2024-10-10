@@ -224,7 +224,7 @@ const ListsPage: NextPage = () => {
               <div
                 key={list.id}
                 className={cn(
-                  'flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row hover:bg-accent cursor-pointer transition-all flex-wrap',
+                  'group flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row hover:bg-accent cursor-pointer transition-all flex-wrap',
                   isEditing && 'border-sky-500',
                 )}
                 onClick={() => handleRedirectToList(list.id)}
@@ -294,6 +294,7 @@ const ListsPage: NextPage = () => {
                         }}
                         onMouseEnter={handleActionMouseEnter}
                         onMouseLeave={handleActionMouseLeave}
+                        className="group-hover:opacity-100 md:opacity-0"
                       >
                         <Pencil className="size-4" />
                       </Button>
@@ -307,6 +308,7 @@ const ListsPage: NextPage = () => {
                         }}
                         onMouseEnter={handleActionMouseEnter}
                         // onMouseLeave={handleActionMouseLeave}
+                        className="group-hover:opacity-100 md:opacity-0"
                       >
                         <Trash className="size-4" />
                       </Button>

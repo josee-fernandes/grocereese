@@ -339,7 +339,7 @@ const ListPage: NextPage = () => {
               <div
                 key={item.id}
                 className={cn(
-                  'flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row flex-wrap',
+                  'group flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row flex-wrap transition-all',
                   item.caught &&
                     item.price > 0 &&
                     item.quantity > 0 &&
@@ -350,7 +350,7 @@ const ListPage: NextPage = () => {
                   isEditing && 'border-sky-500',
                 )}
               >
-                <div className="flex items-center gap-4 flex-1 flex-wrap">
+                <div className="flex items-center gap-4 flex-1">
                   <Checkbox
                     id={item.id}
                     className={cn(
@@ -445,6 +445,7 @@ const ListPage: NextPage = () => {
                         variant="outline"
                         size="icon"
                         onClick={() => handleEditItem(item.id)}
+                        className="group-hover:opacity-100 md:opacity-0 transition-all"
                       >
                         <Pencil className="size-4" />
                       </Button>
@@ -454,6 +455,7 @@ const ListPage: NextPage = () => {
                         onClick={() =>
                           handleOpenDeleteGroceryItemDialog(item.id)
                         }
+                        className="group-hover:opacity-100 md:opacity-0 transition-all"
                       >
                         <Trash className="size-4" />
                       </Button>
