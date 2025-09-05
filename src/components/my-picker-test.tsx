@@ -13,17 +13,17 @@ interface CustomPickerProps {
 
 const reaisOptions: PickerOption[] = Array.from({ length: 100 }, (_, i) => ({
   label: i.toString(),
-  value: i.toString()
+  value: i.toString(),
 }))
 
 const centavosOptions: PickerOption[] = Array.from({ length: 100 }, (_, i) => ({
   label: i.toString().padStart(2, '0'),
-  value: i.toString().padStart(2, '0')
+  value: i.toString().padStart(2, '0'),
 }))
 
 export const MyPicker: React.FC<CustomPickerProps> = ({
   onValueChange,
-  initialValue = { reais: '0', centavos: '00' }
+  initialValue = { reais: '0', centavos: '00' },
 }) => {
   const [isVisible, setIsVisible] = useState(false)
   const [selectedValue, setSelectedValue] = useState(initialValue)
@@ -33,7 +33,7 @@ export const MyPicker: React.FC<CustomPickerProps> = ({
   useEffect(() => {
     setSelectedValue(initialValue)
     setTempValue(initialValue)
-  }, [initialValue.reais, initialValue.centavos])
+  }, [initialValue.reais, initialValue.centavos, initialValue])
 
   const handleConfirm = () => {
     setSelectedValue(tempValue)
@@ -47,11 +47,11 @@ export const MyPicker: React.FC<CustomPickerProps> = ({
   }
 
   const handleReaisChange = (value: string) => {
-    setTempValue(prev => ({ ...prev, reais: value }))
+    setTempValue((prev) => ({ ...prev, reais: value }))
   }
 
   const handleCentavosChange = (value: string) => {
-    setTempValue(prev => ({ ...prev, centavos: value }))
+    setTempValue((prev) => ({ ...prev, centavos: value }))
   }
 
   return (
@@ -68,7 +68,9 @@ export const MyPicker: React.FC<CustomPickerProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-80 max-h-96 shadow-xl">
             <div className="text-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-800">Selecionar Preço</h3>
+              <h3 className="text-lg font-semibold text-gray-800">
+                Selecionar Preço
+              </h3>
             </div>
 
             <div className="flex gap-4 mb-6">
@@ -119,10 +121,7 @@ export const MyPicker: React.FC<CustomPickerProps> = ({
               >
                 Cancelar
               </Button>
-              <Button
-                onClick={handleConfirm}
-                className="flex-1"
-              >
+              <Button onClick={handleConfirm} className="flex-1">
                 Confirmar
               </Button>
             </div>

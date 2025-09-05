@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
+import { useState, useEffect, useCallback } from 'react'
 
 interface PickerOption {
   label: string
@@ -13,50 +12,50 @@ interface CustomPickerProps {
 
 const reaisOptions: PickerOption[] = Array.from({ length: 100 }, (_, i) => ({
   label: i.toString(),
-  value: i.toString()
+  value: i.toString(),
 }))
 
 const centavosOptions: PickerOption[] = Array.from({ length: 100 }, (_, i) => ({
   label: i.toString().padStart(2, '0'),
-  value: i.toString().padStart(2, '0')
+  value: i.toString().padStart(2, '0'),
 }))
 
 export const MyPicker: React.FC<CustomPickerProps> = ({
   onValueChange,
-  initialValue = { reais: '0', centavos: '00' }
+  initialValue = { reais: '0', centavos: '00' },
 }) => {
-  const [isVisible, setIsVisible] = useState(true)
-  const [selectedValue, setSelectedValue] = useState(initialValue)
+  const [, setIsVisible] = useState(true)
+  const [, setSelectedValue] = useState(initialValue)
   const [tempValue, setTempValue] = useState(initialValue)
 
   // Update internal state when initialValue changes
   useEffect(() => {
     setSelectedValue(initialValue)
     setTempValue(initialValue)
-  }, [initialValue.reais, initialValue.centavos])
+  }, [initialValue.reais, initialValue.centavos, initialValue])
 
-  const handleConfirm = () => {
+  const handleConfirm = useCallback(() => {
     setSelectedValue(tempValue)
     onValueChange?.(tempValue)
     setIsVisible(false)
-  }
+  }, [tempValue, onValueChange, setIsVisible])
 
-  const handleCancel = () => {
-    setTempValue(selectedValue)
-    setIsVisible(false)
-  }
+  // const handleCancel = () => {
+  //   setTempValue(selectedValue)
+  //   setIsVisible(false)
+  // }
 
   const handleReaisChange = (value: string) => {
-    setTempValue(prev => ({ ...prev, reais: value }))
+    setTempValue((prev) => ({ ...prev, reais: value }))
   }
 
   const handleCentavosChange = (value: string) => {
-    setTempValue(prev => ({ ...prev, centavos: value }))
+    setTempValue((prev) => ({ ...prev, centavos: value }))
   }
 
   useEffect(() => {
     handleConfirm()
-  }, [tempValue])
+  }, [tempValue, handleConfirm])
 
   return (
     <>

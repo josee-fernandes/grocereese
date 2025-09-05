@@ -184,7 +184,6 @@ const ListsPage: NextPage = () => {
     toast.success('Sucesso!', {
       description: 'Lista importada com sucesso!',
     })
-
   }, [setLists])
 
   useEffect(() => {
@@ -258,9 +257,9 @@ const ListsPage: NextPage = () => {
                   isEditing && 'border-sky-500',
                 )}
                 onClick={() => handleRedirectToList(list.id)}
-              // onClick={(event) => {
-              //   console.log('item clicado', event)
-              // }}
+                // onClick={(event) => {
+                //   console.log('item clicado', event)
+                // }}
               >
                 <div className="flex items-center gap-4 flex-1">
                   {isEditing ? (

@@ -354,13 +354,13 @@ const ListPage: NextPage = () => {
                 className={cn(
                   'group flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row flex-wrap transition-all',
                   item.caught &&
-                  item.price > 0 &&
-                  item.quantity > 0 &&
-                  'text-emerald-500',
+                    item.price > 0 &&
+                    item.quantity > 0 &&
+                    'text-emerald-500',
                   item.caught &&
-                  (item.price === 0 || item.quantity === 0) &&
-                  'text-amber-500',
-                  isEditing && 'border-sky-500'
+                    (item.price === 0 || item.quantity === 0) &&
+                    'text-amber-500',
+                  isEditing && 'border-sky-500',
                 )}
               >
                 <div className="flex items-center gap-4 flex-1 w-full md:w-max">
@@ -368,12 +368,12 @@ const ListPage: NextPage = () => {
                     id={item.id}
                     className={cn(
                       item.caught &&
-                      item.price > 0 &&
-                      item.quantity > 0 &&
-                      'data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500',
+                        item.price > 0 &&
+                        item.quantity > 0 &&
+                        'data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500',
                       item.caught &&
-                      (item.price === 0 || item.quantity === 0) &&
-                      'data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500',
+                        (item.price === 0 || item.quantity === 0) &&
+                        'data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500',
                     )}
                     defaultChecked={item.caught}
                     onClick={() => handleToggleCaughtItem(item.id)}
@@ -410,11 +410,17 @@ const ListPage: NextPage = () => {
                             render={({ field }) => (
                               <MyPicker
                                 initialValue={{
-                                  reais: Math.floor(field.value || 0).toString(),
-                                  centavos: ((field.value || 0) % 1 * 100).toFixed(0).padStart(2, '0')
+                                  reais: Math.floor(
+                                    field.value || 0,
+                                  ).toString(),
+                                  centavos: (((field.value || 0) % 1) * 100)
+                                    .toFixed(0)
+                                    .padStart(2, '0'),
                                 }}
                                 onValueChange={(value) => {
-                                  const price = parseFloat(`${value.reais}.${value.centavos}`)
+                                  const price = parseFloat(
+                                    `${value.reais}.${value.centavos}`,
+                                  )
                                   field.onChange(price)
                                 }}
                               />

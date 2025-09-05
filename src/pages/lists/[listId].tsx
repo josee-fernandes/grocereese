@@ -8,7 +8,14 @@ import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { getAll, getById, save } from '@/utils/local'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Check, Pencil, PencilOff, Trash, ExternalLink } from 'lucide-react'
+import {
+  ArrowLeft,
+  Check,
+  Pencil,
+  PencilOff,
+  Trash,
+  ExternalLink,
+} from 'lucide-react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useRouter as useNavigation } from 'next/navigation'
@@ -263,7 +270,7 @@ const ListPage: NextPage = () => {
   const handleExportList = useCallback(() => {
     const data = {
       ...list,
-      groceries
+      groceries,
     }
 
     navigator.clipboard.writeText(JSON.stringify(data))
@@ -379,12 +386,12 @@ const ListPage: NextPage = () => {
                 className={cn(
                   'group flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row flex-wrap transition-all',
                   item.caught &&
-                  item.price > 0 &&
-                  item.quantity > 0 &&
-                  'text-emerald-500',
+                    item.price > 0 &&
+                    item.quantity > 0 &&
+                    'text-emerald-500',
                   item.caught &&
-                  (item.price === 0 || item.quantity === 0) &&
-                  'text-amber-500',
+                    (item.price === 0 || item.quantity === 0) &&
+                    'text-amber-500',
                   isEditing && 'border-sky-500',
                 )}
               >
@@ -393,12 +400,12 @@ const ListPage: NextPage = () => {
                     id={item.id}
                     className={cn(
                       item.caught &&
-                      item.price > 0 &&
-                      item.quantity > 0 &&
-                      'data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500',
+                        item.price > 0 &&
+                        item.quantity > 0 &&
+                        'data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500',
                       item.caught &&
-                      (item.price === 0 || item.quantity === 0) &&
-                      'data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500',
+                        (item.price === 0 || item.quantity === 0) &&
+                        'data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500',
                     )}
                     defaultChecked={item.caught}
                     onClick={() => handleToggleCaughtItem(item.id)}
