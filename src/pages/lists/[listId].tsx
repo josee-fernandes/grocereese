@@ -8,7 +8,7 @@ import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { getAll, getById, save } from '@/utils/local'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Check, Pencil, PencilOff, Trash } from 'lucide-react'
+import { ArrowLeft, Check, Pencil, PencilOff, Trash, ExternalLink } from 'lucide-react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useRouter as useNavigation } from 'next/navigation'
@@ -260,6 +260,19 @@ const ListPage: NextPage = () => {
     navigationRouter.push('/lists')
   }, [navigationRouter])
 
+  const handleExportList = useCallback(() => {
+    const data = {
+      ...list,
+      groceries
+    }
+
+    navigator.clipboard.writeText(JSON.stringify(data))
+
+    toast.success('Sucesso!', {
+      description: 'Lista exportada para a área de transferência com sucesso!',
+    })
+  }, [list, groceries])
+
   useEffect(() => {
     if (listId) {
       checkForGroceriesWithoutAList(listId.toString()).then(() => {
@@ -275,15 +288,26 @@ const ListPage: NextPage = () => {
       <main className="mx-auto max-w-[1200px] w-full px-4 md:px-6 py-10">
         <div className="flex justify-between items-center gap-4 flex-col md:flex-row flex-wrap md:flex-nowrap">
           <div className="flex items-center gap-2 flex-col md:flex-row w-full flex-wrap">
-            <Button
-              variant="outline"
-              size="icon"
-              className="self-start"
-              onClick={handleBackToLists}
-            >
-              <span className="sr-only">Voltar</span>
-              <ArrowLeft className="size-4" />
-            </Button>
+            <div className="flex justify-between md:justify-start items-center gap-2 w-full">
+              <Button
+                variant="outline"
+                size="icon"
+                className="self-start"
+                onClick={handleBackToLists}
+              >
+                <span className="sr-only">Voltar</span>
+                <ArrowLeft className="size-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="self-start"
+                onClick={handleExportList}
+              >
+                <span className="sr-only">Exportar lista</span>
+                <ExternalLink className="size-4" />
+              </Button>
+            </div>
             <div className="flex items-center gap-2 flex-col md:flex-row flex-wrap">
               <h2 className="text-xl font-bold text-center">
                 {list?.name ?? 'Lista de compras'}
@@ -355,12 +379,12 @@ const ListPage: NextPage = () => {
                 className={cn(
                   'group flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row flex-wrap transition-all',
                   item.caught &&
-                    item.price > 0 &&
-                    item.quantity > 0 &&
-                    'text-emerald-500',
+                  item.price > 0 &&
+                  item.quantity > 0 &&
+                  'text-emerald-500',
                   item.caught &&
-                    (item.price === 0 || item.quantity === 0) &&
-                    'text-amber-500',
+                  (item.price === 0 || item.quantity === 0) &&
+                  'text-amber-500',
                   isEditing && 'border-sky-500',
                 )}
               >
@@ -369,12 +393,12 @@ const ListPage: NextPage = () => {
                     id={item.id}
                     className={cn(
                       item.caught &&
-                        item.price > 0 &&
-                        item.quantity > 0 &&
-                        'data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500',
+                      item.price > 0 &&
+                      item.quantity > 0 &&
+                      'data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500',
                       item.caught &&
-                        (item.price === 0 || item.quantity === 0) &&
-                        'data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500',
+                      (item.price === 0 || item.quantity === 0) &&
+                      'data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500',
                     )}
                     defaultChecked={item.caught}
                     onClick={() => handleToggleCaughtItem(item.id)}

@@ -11,7 +11,7 @@ import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
-import { Check, Pencil, PencilOff, Trash } from 'lucide-react'
+import { Check, Pencil, PencilOff, Trash, Import } from 'lucide-react'
 import { DeleteListDialog } from '@/components/lists/delete-list-dialog'
 import { useRouter } from 'next/navigation'
 
@@ -166,6 +166,10 @@ const ListsPage: NextPage = () => {
     [hasActionHovering, router],
   )
 
+  const handleImportList = useCallback(() => {
+    console.log('importing list')
+  }, [])
+
   useEffect(() => {
     loadLists()
   }, [loadLists])
@@ -175,8 +179,17 @@ const ListsPage: NextPage = () => {
       <Navbar />
       <main className="mx-auto max-w-[1200px] w-full px-4 md:px-6 py-10">
         <div className="flex justify-between items-center gap-4 flex-col md:flex-row flex-wrap">
-          <div className="flex items-center gap-2 flex-col md:flex-row flex-wrap">
+          <div className="flex justify-between items-center gap-2 flex-wrap w-full">
             <h2 className="text-xl font-bold text-center">Listas de compras</h2>
+            <Button
+              variant="outline"
+              size="icon"
+              className="self-start"
+              onClick={handleImportList}
+            >
+              <span className="sr-only">Importar lista</span>
+              <Import className="size-4" />
+            </Button>
           </div>
         </div>
         <div
@@ -228,9 +241,9 @@ const ListsPage: NextPage = () => {
                   isEditing && 'border-sky-500',
                 )}
                 onClick={() => handleRedirectToList(list.id)}
-                // onClick={(event) => {
-                //   console.log('item clicado', event)
-                // }}
+              // onClick={(event) => {
+              //   console.log('item clicado', event)
+              // }}
               >
                 <div className="flex items-center gap-4 flex-1">
                   {isEditing ? (
