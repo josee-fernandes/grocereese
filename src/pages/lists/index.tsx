@@ -166,9 +166,26 @@ const ListsPage: NextPage = () => {
     [hasActionHovering, router],
   )
 
-  const handleImportList = useCallback(() => {
-    console.log('importing list')
-  }, [])
+  const handleImportList = useCallback(async () => {
+    const data = await navigator.clipboard.readText()
+
+    const parsedData = JSON.parse(data) as List & { groceries: GroceryItem[] }
+
+    const { groceries, ...list } = parsedData
+
+    await save<List>('lists', list)
+
+    setLists((oldLists) => [...oldLists, list])
+
+    for (const grocery of groceries) {
+      await save<GroceryItem>('groceries', grocery)
+    }
+
+    toast.success('Sucesso!', {
+      description: 'Lista importada com sucesso!',
+    })
+
+  }, [setLists])
 
   useEffect(() => {
     loadLists()
