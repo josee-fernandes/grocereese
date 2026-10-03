@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, Import, Pencil, PencilOff, Trash } from 'lucide-react'
+import { CheckIcon, ImportIcon, ListPlusIcon, PencilIcon, PencilOffIcon, TrashIcon } from 'lucide-react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -187,20 +187,21 @@ const ListsPage: NextPage = () => {
 	return (
 		<div>
 			<Navbar />
-			<main className="mx-auto max-w-[1200px] w-full px-4 md:px-6 py-10">
+			<main className="mx-auto max-w-300 w-full px-4 md:px-6 py-10">
 				<div className="flex justify-between items-center gap-4 flex-col md:flex-row flex-wrap">
 					<div className="flex justify-between items-center gap-2 flex-wrap w-full">
 						<h2 className="text-xl font-bold text-center">Listas de compras</h2>
-						<Button variant="outline" size="icon" className="self-start" onClick={handleImportList}>
-							<span className="sr-only">Importar lista</span>
-							<Import className="size-4" />
+						<Button className="gap-2" onClick={handleImportList}>
+							<ImportIcon className="size-4" />
+							Importar lista copiada
 						</Button>
 					</div>
 				</div>
 				<div className="flex flex-col gap-2 mt-6 flex-wrap" onMouseEnter={handleActionMouseLeave}>
 					{!isCreatingList && (
-						<Button variant="outline" className="border-dashed !p-4 h-max" onClick={handleShowCreateListForm}>
-							Criar lista
+						<Button variant="outline" className="border-dashed p-4! h-max gap-2" onClick={handleShowCreateListForm}>
+							<ListPlusIcon className="size-4" />
+							Criar nova lista
 						</Button>
 					)}
 					{isCreatingList && (
@@ -264,7 +265,7 @@ const ListsPage: NextPage = () => {
 													handleActionMouseLeave()
 												}}
 											>
-												<Check className="size-4" />
+												<CheckIcon className="size-4" />
 											</Button>
 											<Button
 												type="reset"
@@ -278,7 +279,7 @@ const ListsPage: NextPage = () => {
 												onMouseEnter={handleActionMouseEnter}
 												onMouseLeave={handleActionMouseLeave}
 											>
-												<PencilOff className="size-4" />
+												<PencilOffIcon className="size-4" />
 											</Button>
 										</form>
 									) : (
@@ -295,7 +296,7 @@ const ListsPage: NextPage = () => {
 												onMouseLeave={handleActionMouseLeave}
 												className="group-hover:opacity-100 md:opacity-0"
 											>
-												<Pencil className="size-4" />
+												<PencilIcon className="size-4" />
 											</Button>
 											<Button
 												variant="outline"
@@ -309,7 +310,7 @@ const ListsPage: NextPage = () => {
 												// onMouseLeave={handleActionMouseLeave}
 												className="group-hover:opacity-100 md:opacity-0"
 											>
-												<Trash className="size-4" />
+												<TrashIcon className="size-4" />
 											</Button>
 											{deletingListId === list.id && (
 												<DeleteListDialog
