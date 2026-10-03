@@ -30,14 +30,8 @@ type CreateItemFormData = z.infer<typeof createItemFormSchema>
 
 const updateItemFormSchema = z.object({
 	name: z.string().min(1),
-	price: z
-		.string()
-		.min(0)
-		.transform((value) => Number(value)),
-	quantity: z
-		.string()
-		.min(0)
-		.transform((value) => Number(value)),
+	price: z.number().min(0),
+	quantity: z.number().min(0),
 })
 
 type UpdateItemFormData = z.infer<typeof updateItemFormSchema>
@@ -270,7 +264,7 @@ const ListPage: NextPage = () => {
 	return (
 		<div>
 			<Navbar />
-			<main className="mx-auto max-w-[1200px] w-full px-4 md:px-6 py-10">
+			<main className="mx-auto max-w-300 w-full px-4 md:px-6 py-10">
 				<div className="flex justify-between items-center gap-4 flex-col md:flex-row flex-wrap md:flex-nowrap">
 					<div className="flex items-center gap-2 flex-col md:flex-row w-full flex-wrap">
 						<div className="flex justify-between md:justify-start items-center gap-2 w-full">
@@ -373,7 +367,7 @@ const ListPage: NextPage = () => {
 														max={99}
 														step={0.01}
 														className="w-14"
-														{...registerUpdate('price')}
+														{...registerUpdate('price', { valueAsNumber: true })}
 													/>
 												</div>
 												<Separator orientation="vertical" className="h-4" />
@@ -384,7 +378,7 @@ const ListPage: NextPage = () => {
 														min={0}
 														max={99}
 														className="w-14"
-														{...registerUpdate('quantity')}
+														{...registerUpdate('quantity', { valueAsNumber: true })}
 													/>
 													unidades
 												</div>

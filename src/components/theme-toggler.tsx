@@ -1,11 +1,10 @@
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { FC } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
-export const ThemeToggler: FC = () => {
+export function ThemeToggler() {
 	const { setTheme } = useTheme()
 
 	return (
@@ -25,5 +24,3 @@ export const ThemeToggler: FC = () => {
 		</DropdownMenu>
 	)
 }
-
-ThemeToggler.displayName = 'ThemeToggler'

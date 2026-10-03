@@ -32,10 +32,7 @@ type CreateItemFormData = z.infer<typeof createItemFormSchema>
 const updateItemFormSchema = z.object({
 	name: z.string().min(1),
 	price: z.number().min(0),
-	quantity: z
-		.string()
-		.min(0)
-		.transform((value) => Number(value)),
+	quantity: z.number().min(0),
 })
 
 type UpdateItemFormData = z.infer<typeof updateItemFormSchema>
@@ -371,7 +368,7 @@ const ListPage: NextPage = () => {
 														min={0}
 														max={99}
 														className="w-14"
-														{...registerUpdate('quantity')}
+														{...registerUpdate('quantity', { valueAsNumber: true })}
 													/>
 													unidades
 												</div>

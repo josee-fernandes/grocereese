@@ -1,6 +1,6 @@
 import type { AppProps } from 'next/app'
+import { ThemeProvider } from 'next-themes'
 
-import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
 import '@/styles/global.css'
