@@ -1,103 +1,99 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface PickerOption {
-  label: string
-  value: string
+	label: string
+	value: string
 }
 
 interface CustomPickerProps {
-  onValueChange?: (value: { reais: string; centavos: string }) => void
-  initialValue?: { reais: string; centavos: string }
+	onValueChange?: (value: { reais: string; centavos: string }) => void
+	initialValue?: { reais: string; centavos: string }
 }
 
 const reaisOptions: PickerOption[] = Array.from({ length: 100 }, (_, i) => ({
-  label: i.toString(),
-  value: i.toString(),
+	label: i.toString(),
+	value: i.toString(),
 }))
 
 const centavosOptions: PickerOption[] = Array.from({ length: 100 }, (_, i) => ({
-  label: i.toString().padStart(2, '0'),
-  value: i.toString().padStart(2, '0'),
+	label: i.toString().padStart(2, '0'),
+	value: i.toString().padStart(2, '0'),
 }))
 
 export const MyPicker: React.FC<CustomPickerProps> = ({
-  onValueChange,
-  initialValue = { reais: '0', centavos: '00' },
+	onValueChange,
+	initialValue = { reais: '0', centavos: '00' },
 }) => {
-  const [, setIsVisible] = useState(true)
-  const [, setSelectedValue] = useState(initialValue)
-  const [tempValue, setTempValue] = useState(initialValue)
+	const [, setIsVisible] = useState(true)
+	const [, setSelectedValue] = useState(initialValue)
+	const [tempValue, setTempValue] = useState(initialValue)
 
-  // Update internal state when initialValue changes
-  useEffect(() => {
-    setSelectedValue(initialValue)
-    setTempValue(initialValue)
-  }, [initialValue.reais, initialValue.centavos, initialValue])
+	// Update internal state when initialValue changes
+	useEffect(() => {
+		setSelectedValue(initialValue)
+		setTempValue(initialValue)
+	}, [initialValue.reais, initialValue.centavos, initialValue])
 
-  const handleConfirm = useCallback(() => {
-    setSelectedValue(tempValue)
-    onValueChange?.(tempValue)
-    setIsVisible(false)
-  }, [tempValue, onValueChange, setIsVisible])
+	const handleConfirm = useCallback(() => {
+		setSelectedValue(tempValue)
+		onValueChange?.(tempValue)
+		setIsVisible(false)
+	}, [tempValue, onValueChange, setIsVisible])
 
-  // const handleCancel = () => {
-  //   setTempValue(selectedValue)
-  //   setIsVisible(false)
-  // }
+	// const handleCancel = () => {
+	//   setTempValue(selectedValue)
+	//   setIsVisible(false)
+	// }
 
-  const handleReaisChange = (value: string) => {
-    setTempValue((prev) => ({ ...prev, reais: value }))
-  }
+	const handleReaisChange = (value: string) => {
+		setTempValue((prev) => ({ ...prev, reais: value }))
+	}
 
-  const handleCentavosChange = (value: string) => {
-    setTempValue((prev) => ({ ...prev, centavos: value }))
-  }
+	const handleCentavosChange = (value: string) => {
+		setTempValue((prev) => ({ ...prev, centavos: value }))
+	}
 
-  useEffect(() => {
-    handleConfirm()
-  }, [tempValue, handleConfirm])
+	useEffect(() => {
+		handleConfirm()
+	}, [tempValue, handleConfirm])
 
-  return (
-    <>
-      <div className="flex gap-4 mb-6">
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
-            Reais
-          </label>
-          <select
-            value={tempValue.reais}
-            onChange={(e) => handleReaisChange(e.target.value)}
-            className="w-full h-32 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 overflow-y-auto"
-            size={6}
-          >
-            {reaisOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                R$ {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+	return (
+		<>
+			<div className="flex gap-4 mb-6">
+				<div className="flex-1">
+					<label className="block text-sm font-medium text-gray-700 mb-2 text-center">Reais</label>
+					<select
+						value={tempValue.reais}
+						onChange={(e) => handleReaisChange(e.target.value)}
+						className="w-full h-32 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 overflow-y-auto"
+						size={6}
+					>
+						{reaisOptions.map((option) => (
+							<option key={option.value} value={option.value}>
+								R$ {option.label}
+							</option>
+						))}
+					</select>
+				</div>
 
-        <div className="w-px bg-gray-300 self-stretch" />
+				<div className="w-px bg-gray-300 self-stretch" />
 
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
-            Centavos
-          </label>
-          <select
-            value={tempValue.centavos}
-            onChange={(e) => handleCentavosChange(e.target.value)}
-            className="w-full h-32 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 overflow-y-auto"
-            size={6}
-          >
-            {centavosOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                ,{option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-    </>
-  )
+				<div className="flex-1">
+					<label className="block text-sm font-medium text-gray-700 mb-2 text-center">Centavos</label>
+					<select
+						value={tempValue.centavos}
+						onChange={(e) => handleCentavosChange(e.target.value)}
+						className="w-full h-32 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 overflow-y-auto"
+						size={6}
+					>
+						{centavosOptions.map((option) => (
+							<option key={option.value} value={option.value}>
+								,{option.label}
+							</option>
+						))}
+					</select>
+				</div>
+			</div>
+		</>
+	)
 }

@@ -1,18 +1,15 @@
-import { Html, Head, Main, NextScript } from 'next/document'
-import { FC } from 'react'
+import { Head, Html, Main, NextScript } from 'next/document'
 
-const Document: FC = () => {
-  return (
-    <Html lang="en">
-      <Head />
-      <body className="antialiased">
-        <Main />
-        <NextScript />
-      </body>
-    </Html>
-  )
+function Document() {
+	return (
+		<Html lang="pt-BR">
+			<Head />
+			<body className="antialiased">
+				<Main />
+				<NextScript />
+			</body>
+		</Html>
+	)
 }
-
-Document.displayName = 'Document'
 
 export default Document

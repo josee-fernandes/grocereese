@@ -3,13 +3,13 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 const Home: NextPage = () => {
-  const router = useRouter()
+	const router = useRouter()
 
-  useEffect(() => {
-    router.push('/lists')
-  }, [router])
+	useEffect(() => {
+		router.push('/lists')
+	}, [router])
 
-  return <></>
+	return <></>
 }
 
 Home.displayName = 'Home'

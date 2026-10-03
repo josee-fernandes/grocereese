@@ -1,0 +1,111 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+	"vcs": {
+		"enabled": false,
+		"clientKind": "git",
+		"useIgnoreFile": false
+	},
+	"files": {
+		"ignoreUnknown": false,
+		"includes": [
+			"**/src/**/*",
+			"**/.vscode/**/*",
+			"**/index.html",
+			"**/vite.config.ts",
+			"!**/src/route-tree.gen.ts",
+			"!**/src/styles.css",
+			"!**/dist",
+			"!**/node_modules"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab"
+	},
+	"assist": {
+		"enabled": true,
+		"actions": {
+			"source": {
+				"organizeImports": {
+					"level": "on",
+					"options": {
+						"sortBareImports": true,
+						"groups": [
+							[
+								":URL:",
+								":BUN:",
+								":NODE:",
+								":PACKAGE_WITH_PROTOCOL:",
+								":PACKAGE:"
+							],
+							":BLANK_LINE:",
+							[
+								":ALIAS:",
+								"!@/**/*.png",
+								"!@/**/*.jpg",
+								"!@/**/*.jpeg",
+								"!@/**/*.gif",
+								"!@/**/*.svg",
+								"!@/**/*.webp",
+								"!@/**/*.ico",
+								"!@/**/*.avif",
+								"!@/styles/**"
+							],
+							":BLANK_LINE:",
+							[
+								":PATH:",
+								"!**/*.css",
+								"!**/*.scss",
+								"!**/*.less",
+								"!**/*.sass",
+								"!**/*.pcss",
+								"!**/*.styl",
+								"!**/*.png",
+								"!**/*.jpg",
+								"!**/*.jpeg",
+								"!**/*.gif",
+								"!**/*.svg",
+								"!**/*.webp",
+								"!**/*.ico",
+								"!**/*.avif",
+								"!**/styles/**"
+							],
+							":BLANK_LINE:",
+							[
+								"**/*.png",
+								"**/*.jpg",
+								"**/*.jpeg",
+								"**/*.gif",
+								"**/*.svg",
+								"**/*.webp",
+								"**/*.ico",
+								"**/*.avif"
+							],
+							":BLANK_LINE:",
+							[":STYLE:", "@/styles/**", "./styles/**"]
+						]
+					}
+				}
+			}
+		}
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "recommended"
+		},
+		"includes": ["!**/src/components/ui/**/*"]
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "single",
+			"semicolons": "asNeeded",
+			"lineWidth": 120
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	}
+}
