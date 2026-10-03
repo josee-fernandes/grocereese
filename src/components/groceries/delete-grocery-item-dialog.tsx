@@ -106,5 +106,3 @@ export const DeleteGroceryItemDialog: React.FC<DeleteGroceryItemDialogProps> = (
 		</Portal>
 	)
 }
-
-DeleteGroceryItemDialog.displayName = 'DeleteGroceryItemDialog'

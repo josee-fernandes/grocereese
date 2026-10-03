@@ -101,5 +101,3 @@ export const DeleteListDialog: React.FC<DeleteListDialogProps> = ({ isOpen, list
 		</Portal>
 	)
 }
-
-DeleteListDialog.displayName = 'DeleteListDialog'

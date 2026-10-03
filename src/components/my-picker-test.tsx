@@ -22,10 +22,7 @@ const centavosOptions: PickerOption[] = Array.from({ length: 100 }, (_, i) => ({
 	value: i.toString().padStart(2, '0'),
 }))
 
-export const MyPicker: React.FC<CustomPickerProps> = ({
-	onValueChange,
-	initialValue = { reais: '0', centavos: '00' },
-}) => {
+export function MyPicker({ onValueChange, initialValue = { reais: '0', centavos: '00' } }: CustomPickerProps) {
 	const [isVisible, setIsVisible] = useState(false)
 	const [selectedValue, setSelectedValue] = useState(initialValue)
 	const [tempValue, setTempValue] = useState(initialValue)

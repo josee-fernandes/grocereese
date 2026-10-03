@@ -10,5 +10,3 @@ export const NoListsFallback: React.FC = () => {
 		</div>
 	)
 }
-
-NoListsFallback.displayName = 'NoListsFallback'

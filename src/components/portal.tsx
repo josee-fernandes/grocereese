@@ -5,7 +5,7 @@ interface PortalProps {
 	children: React.ReactNode
 }
 
-export const Portal: React.FC<PortalProps> = ({ children }) => {
+export function Portal({ children }: PortalProps) {
 	const [render, setRender] = useState(false)
 
 	useEffect(() => {
@@ -14,5 +14,3 @@ export const Portal: React.FC<PortalProps> = ({ children }) => {
 
 	return <>{render && createPortal(children, document.body)}</>
 }
-
-Portal.displayName = 'Portal'

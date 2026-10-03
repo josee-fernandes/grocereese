@@ -332,6 +332,4 @@ const ListsPage: NextPage = () => {
 	)
 }
 
-ListsPage.displayName = 'ListsPage'
-
 export default ListsPage

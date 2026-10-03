@@ -13,5 +13,3 @@ export const Navbar: React.FC = () => {
 		</nav>
 	)
 }
-
-Navbar.displayName = 'Navbar'

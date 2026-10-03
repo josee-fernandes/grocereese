@@ -428,6 +428,4 @@ const ListPage: NextPage = () => {
 	)
 }
 
-ListPage.displayName = 'ListPage'
-
 export default ListPage
