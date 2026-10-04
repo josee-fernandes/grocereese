@@ -60,7 +60,7 @@ export const DeleteGroceryItemDialog: React.FC<DeleteGroceryItemDialogProps> = (
 		return (
 			<Portal>
 				<Dialog open={isOpen} onOpenChange={onOpenChange}>
-					<DialogContent className="sm:max-w-[425px]">
+					<DialogContent className="sm:max-w-106.25">
 						<DialogHeader>
 							<DialogTitle>Remover item</DialogTitle>
 							<DialogDescription className="sr-only">
