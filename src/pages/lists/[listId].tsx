@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Check, ExternalLink, Pencil, PencilOff, PlusIcon, Trash } from 'lucide-react'
+import { ArrowLeftIcon, Check, CopyIcon, ExternalLinkIcon, Pencil, PencilOff, PlusIcon, Trash } from 'lucide-react'
 import { NextPage } from 'next'
 import { useRouter as useNavigation } from 'next/navigation'
 import { useRouter } from 'next/router'
@@ -20,7 +20,7 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '
 import { Separator } from '@/components/ui/separator'
 import { useLists } from '@/hooks/use-lists'
 import { cn } from '@/lib/utils'
-import { getAll, save } from '@/utils/local'
+import { destroy, getAll, save } from '@/utils/local'
 
 const createItemFormSchema = z.object({
 	name: z.string().min(1, { error: 'Nome do item é obrigatório' }),
@@ -62,6 +62,7 @@ const ListPage: NextPage = () => {
 		register,
 		handleSubmit,
 		reset,
+		setFocus,
 		formState: { errors },
 	} = useForm<CreateItemFormData>({
 		defaultValues: {
@@ -79,6 +80,7 @@ const ListPage: NextPage = () => {
 	const [editingItemId, setEditingItemId] = useState('')
 	const [deletingItemId, setDeletingItemId] = useState('')
 	const [isDeleteGroceryItemDialogOpen, setIsDeleteGroceryItemDialogOpen] = useState(false)
+	const [isShiftPressed, setIsShiftPressed] = useState(false)
 
 	const editingItem = useMemo(
 		() => groceries.find((item) => item.id === editingItemId) ?? null,
@@ -149,6 +151,7 @@ const ListPage: NextPage = () => {
 			setGroceries((oldGroceries) => [...oldGroceries, item])
 
 			handleCancelCreateItem()
+			setFocus('name')
 		} catch (error) {
 			console.error(error)
 		}
@@ -226,20 +229,41 @@ const ListPage: NextPage = () => {
 		setIsDeleteGroceryItemDialogOpen(isOpen)
 	}
 
-	const handleOpenDeleteGroceryItemDialog = (id: string) => {
-		try {
+	const handleDeleteGroceryItem = useCallback(
+		async (id: string) => {
+			try {
+				await destroy<GroceryItem>('groceries', id)
+
+				setGroceries((oldGroceries) => oldGroceries.filter((item) => item.id !== id))
+
+				toast.success('Sucesso!', {
+					description: 'Item removido da lista com sucesso!',
+				})
+			} catch (error) {
+				console.error(error)
+			}
+		},
+		[],
+	)
+
+	const handleDeleteGroceryItemClick = useCallback(
+		(id: string, shiftKey: boolean) => {
+			if (shiftKey) {
+				void handleDeleteGroceryItem(id)
+				return
+			}
+
 			setIsDeleteGroceryItemDialogOpen(true)
 			setDeletingItemId(id)
-		} catch (error) {
-			console.error(error)
-		}
-	}
+		},
+		[handleDeleteGroceryItem],
+	)
 
 	const handleBackToLists = useCallback(() => {
 		navigationRouter.push('/lists')
 	}, [navigationRouter])
 
-	const handleExportList = useCallback(() => {
+	const handleCopyList = useCallback(() => {
 		const data = {
 			...list,
 			groceries,
@@ -259,22 +283,46 @@ const ListPage: NextPage = () => {
 		}
 	}, [hydrate, loadGroceries, listId])
 
+	useEffect(() => {
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Shift') setIsShiftPressed(true)
+		}
+		const onKeyUp = (event: KeyboardEvent) => {
+			if (event.key === 'Shift') setIsShiftPressed(false)
+		}
+		const resetShift = () => setIsShiftPressed(false)
+
+		window.addEventListener('keydown', onKeyDown)
+		window.addEventListener('keyup', onKeyUp)
+		window.addEventListener('blur', resetShift)
+
+		return () => {
+			window.removeEventListener('keydown', onKeyDown)
+			window.removeEventListener('keyup', onKeyUp)
+			window.removeEventListener('blur', resetShift)
+		}
+	}, [])
+
 	return (
 		<div>
 			<Navbar />
 			<main className="mx-auto max-w-300 w-full px-4 md:px-6 py-10">
-				<div className="flex justify-between items-center gap-4 flex-col md:flex-row flex-wrap md:flex-nowrap">
-					<div className="flex items-center gap-2 flex-col md:flex-row w-full flex-wrap">
-						<div className="flex justify-between md:justify-start items-center gap-2 w-full">
-							<Button variant="outline" size="icon" className="self-start" onClick={handleBackToLists}>
-								<span className="sr-only">Voltar</span>
-								<ArrowLeft className="size-4" />
-							</Button>
-							<Button variant="outline" onClick={handleExportList}>
-								<ExternalLink className="size-4" />
-								Exportar lista
-							</Button>
-						</div>
+				<div className="flex items-center justify-between gap-2 w-full">
+					<div>
+						<Button variant="outline" onClick={handleBackToLists}>
+							<ArrowLeftIcon className="size-4" />
+							Voltar
+						</Button>
+					</div>
+					<div>
+						<Button variant="outline" onClick={handleCopyList}>
+							<CopyIcon className="size-4" />
+							Copiar lista
+						</Button>
+					</div>
+				</div>
+				<div className="mt-10 flex justify-between items-center gap-4 flex-col md:flex-row flex-wrap md:flex-nowrap">
+					<div className="flex items-center flex-col md:flex-row w-full flex-wrap">
 						<div className="flex items-center gap-2 flex-col md:flex-row flex-wrap">
 							<h2 className="text-xl font-bold text-center">{list?.name ?? 'Lista de compras'}</h2>
 							<Separator orientation="vertical" className="hidden h-6 md:block" />
@@ -404,10 +452,14 @@ const ListPage: NextPage = () => {
 												<Pencil className="size-4" />
 											</Button>
 											<Button
-												variant="outline"
+												variant={isShiftPressed ? 'destructive' : 'outline'}
 												size="icon"
-												onClick={() => handleOpenDeleteGroceryItemDialog(item.id)}
-												className="group-hover:opacity-100 md:opacity-0 transition-all"
+												onClick={(event) => handleDeleteGroceryItemClick(item.id, event.shiftKey)}
+												className={cn(
+													'group-hover:opacity-100 md:opacity-0 transition-all',
+													isShiftPressed && 'md:opacity-100',
+												)}
+												title={isShiftPressed ? 'Remover sem confirmação' : 'Remover item'}
 											>
 												<Trash className="size-4" />
 											</Button>
