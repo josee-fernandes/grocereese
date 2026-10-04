@@ -108,21 +108,25 @@ const ListsPage: NextPage = () => {
 	)
 
 	const handleImportList = useCallback(async () => {
-		const data = await navigator.clipboard.readText()
+		try {
+			const data = await navigator.clipboard.readText()
 
-		const parsedData = JSON.parse(data) as List & { groceries: GroceryItem[] }
+			const parsedData = JSON.parse(data) as List & { groceries: GroceryItem[] }
 
-		const { groceries, ...list } = parsedData
+			const { groceries, ...list } = parsedData
 
-		await addList(list)
+			await addList(list)
 
-		for (const grocery of groceries) {
-			await save<GroceryItem>('groceries', grocery)
+			for (const grocery of groceries) {
+				await save<GroceryItem>('groceries', grocery)
+			}
+
+			toast.success('Sucesso!', {
+				description: 'Lista importada com sucesso!',
+			})
+		} catch {
+			toast.info('Nenhuma lista válida copiada para importação.')
 		}
-
-		toast.success('Sucesso!', {
-			description: 'Lista importada com sucesso!',
-		})
 	}, [addList])
 
 	return (
@@ -151,9 +155,6 @@ const ListsPage: NextPage = () => {
 									isEditing && 'border-sky-500',
 								)}
 								onClick={() => handleRedirectToList(list.id)}
-								// onClick={(event) => {
-								//   console.log('item clicado', event)
-								// }}
 							>
 								<div className="flex items-center gap-4 flex-1">
 									{isEditing ? (

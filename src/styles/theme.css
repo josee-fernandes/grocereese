@@ -95,7 +95,7 @@
 	--sidebar-accent-foreground: oklch(0.1649 0.0352 281.8285);
 	--sidebar-border: oklch(0.3279 0.0832 280.789);
 	--sidebar-ring: oklch(0.6726 0.2904 341.4084);
-	--font-sans: Outfit, sans-serif;
+	--font-sans: "DM Sans", sans-serif;
 	--font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 	--font-mono: Fira Code, monospace;
 	--radius: 0.5rem;

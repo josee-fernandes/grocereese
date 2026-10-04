@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Check, ExternalLink, Pencil, PencilOff, Trash } from 'lucide-react'
+import { ArrowLeft, Check, ExternalLink, Pencil, PencilOff, PlusIcon, Trash } from 'lucide-react'
 import { NextPage } from 'next'
 import { useRouter as useNavigation } from 'next/navigation'
 import { useRouter } from 'next/router'
@@ -14,14 +14,16 @@ import { NoGroceriesFallback } from '@/components/groceries/no-groceries-fallbac
 import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
 import { Separator } from '@/components/ui/separator'
-import { cn } from '@/lib/utils'
 import { useLists } from '@/hooks/use-lists'
+import { cn } from '@/lib/utils'
 import { getAll, save } from '@/utils/local'
 
 const createItemFormSchema = z.object({
-	name: z.string().min(1),
+	name: z.string().min(1, { error: 'Nome do item é obrigatório' }),
 	price: z.number().min(0),
 	quantity: z.number().min(0),
 	caught: z.boolean(),
@@ -56,7 +58,12 @@ const ListPage: NextPage = () => {
 	const { listId } = router.query
 	const navigationRouter = useNavigation()
 
-	const { register, handleSubmit, reset } = useForm<CreateItemFormData>({
+	const {
+		register,
+		handleSubmit,
+		reset,
+		formState: { errors },
+	} = useForm<CreateItemFormData>({
 		defaultValues: {
 			name: '',
 			price: 0,
@@ -91,10 +98,7 @@ const ListPage: NextPage = () => {
 		resolver: zodResolver(updateItemFormSchema),
 	})
 
-	const list = useMemo(
-		() => (listId ? getListById(listId.toString()) : null),
-		[listId, getListById],
-	)
+	const list = useMemo(() => (listId ? getListById(listId.toString()) : null), [listId, getListById])
 
 	const caughtItems = useMemo(() => groceries.filter((item) => item.caught) ?? [], [groceries])
 	const total = useMemo(
@@ -243,9 +247,7 @@ const ListPage: NextPage = () => {
 
 		navigator.clipboard.writeText(JSON.stringify(data))
 
-		toast.success('Sucesso!', {
-			description: 'Lista exportada para a área de transferência com sucesso!',
-		})
+		toast.success('Lista copiada com sucesso!')
 	}, [list, groceries])
 
 	useEffect(() => {
@@ -268,9 +270,9 @@ const ListPage: NextPage = () => {
 								<span className="sr-only">Voltar</span>
 								<ArrowLeft className="size-4" />
 							</Button>
-							<Button variant="outline" size="icon" className="self-start" onClick={handleExportList}>
-								<span className="sr-only">Exportar lista</span>
+							<Button variant="outline" onClick={handleExportList}>
 								<ExternalLink className="size-4" />
+								Exportar lista
 							</Button>
 						</div>
 						<div className="flex items-center gap-2 flex-col md:flex-row flex-wrap">
@@ -292,28 +294,24 @@ const ListPage: NextPage = () => {
 						</p>
 					</div>
 				</div>
+				<Separator className="my-4" />
 				<div className="flex flex-col gap-2 mt-6 flex-wrap">
-					{!isCreatingItem && (
-						<Button variant="outline" className="border-dashed !p-4 h-max" onClick={handleShowCreateItemForm}>
-							Adicionar item
-						</Button>
-					)}
-					{isCreatingItem && (
-						<form
-							className="flex items-center justify-between gap-2 p-2 border rounded border-dashed flex-wrap md:flex-nowrap"
-							onSubmit={handleSubmit(createItem)}
-						>
-							<Input placeholder="Digite aqui o nome do item ..." className="border-none" {...register('name')} />
-							<div className="flex items-center gap-2 flex-1 flex-wrap md:flex-nowrap">
-								<Button type="submit" className="flex-1">
-									Adicionar
-								</Button>
-								<Button type="reset" variant="secondary" className="flex-1" onClick={handleCancelCreateItem}>
-									Cancelar
-								</Button>
-							</div>
-						</form>
-					)}
+					<form onSubmit={handleSubmit(createItem)}>
+						<Field>
+							<FieldLabel htmlFor="name">Nome do item</FieldLabel>
+							<InputGroup>
+								<InputGroupInput id="name" {...register('name')} />
+								<InputGroupAddon align="inline-end">
+									<InputGroupButton type="submit" variant="default">
+										<PlusIcon className="size-4" />
+										Adicionar
+									</InputGroupButton>
+								</InputGroupAddon>
+							</InputGroup>
+							<FieldError>{errors?.name?.message}</FieldError>
+						</Field>
+					</form>
+					<Separator className="my-4" />
 					{groceries.map((item) => {
 						const isEditing = item.id === editingItemId
 

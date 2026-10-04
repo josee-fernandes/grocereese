@@ -14,9 +14,6 @@ function App({ Component, pageProps }: AppProps) {
 				closeButton
 				toastOptions={{
 					duration: 3000,
-					classNames: {
-						closeButton: 'right-0 left-[initial] translate-x-[35%] -translate-y-[35%]',
-					},
 				}}
 			/>
 			<Component {...pageProps} />
