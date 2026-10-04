@@ -17,7 +17,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
-import { getAll, getById, save } from '@/utils/local'
+import { useLists } from '@/hooks/use-lists'
+import { getAll, save } from '@/utils/local'
 
 const createItemFormSchema = z.object({
 	name: z.string().min(1),
@@ -65,7 +66,7 @@ const ListPage: NextPage = () => {
 		resolver: zodResolver(createItemFormSchema),
 	})
 
-	const [list, setList] = useState<List | null>(null)
+	const { getListById, updateList, hydrate } = useLists()
 	const [groceries, setGroceries] = useState<Groceries>([])
 	const [isCreatingItem, setIsCreatingItem] = useState(false)
 	const [editingItemId, setEditingItemId] = useState('')
@@ -90,21 +91,16 @@ const ListPage: NextPage = () => {
 		resolver: zodResolver(updateItemFormSchema),
 	})
 
+	const list = useMemo(
+		() => (listId ? getListById(listId.toString()) : null),
+		[listId, getListById],
+	)
+
 	const caughtItems = useMemo(() => groceries.filter((item) => item.caught) ?? [], [groceries])
 	const total = useMemo(
 		() => caughtItems.reduce((total, item) => total + item.price * item.quantity, 0) ?? 0,
 		[caughtItems],
 	)
-
-	const loadList = useCallback(async (id: string) => {
-		try {
-			const response = await getById<List>('lists', id)
-
-			setList(response)
-		} catch (error) {
-			console.error(error)
-		}
-	}, [])
 
 	const loadGroceries = useCallback(async (listId: string) => {
 		try {
@@ -207,7 +203,7 @@ const ListPage: NextPage = () => {
 			}
 
 			await save<GroceryItem>('groceries', updatedItem)
-			await save<List>('lists', updatedList)
+			await updateList(updatedList)
 
 			setGroceries((oldGroceries) => oldGroceries.map((item) => (item.id === editingItemId ? updatedItem : item)))
 
@@ -255,11 +251,11 @@ const ListPage: NextPage = () => {
 	useEffect(() => {
 		if (listId) {
 			checkForGroceriesWithoutAList(listId.toString()).then(() => {
-				loadList(listId.toString())
+				void hydrate()
 				loadGroceries(listId.toString())
 			})
 		}
-	}, [loadList, loadGroceries, listId])
+	}, [hydrate, loadGroceries, listId])
 
 	return (
 		<div>

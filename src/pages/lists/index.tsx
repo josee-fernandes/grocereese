@@ -1,26 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CheckIcon, ImportIcon, ListPlusIcon, PencilIcon, PencilOffIcon, TrashIcon } from 'lucide-react'
+import { CheckIcon, ImportIcon, PencilIcon, PencilOffIcon, TrashIcon } from 'lucide-react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
 
+import { CreateListDialog } from '@/components/create-list-dialog'
 import { DeleteListDialog } from '@/components/lists/delete-list-dialog'
 import { NoListsFallback } from '@/components/lists/no-lists-fallback'
 import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useLists } from '@/hooks/use-lists'
 import { cn } from '@/lib/utils'
-import { getAll, save } from '@/utils/local'
-
-const createListFormSchema = z.object({
-	name: z.string().min(1),
-})
-
-type CreateListFormData = z.infer<typeof createListFormSchema>
+import { save } from '@/utils/local'
 
 const updateListFormSchema = z.object({
 	name: z.string().min(1),
@@ -30,16 +26,7 @@ type UpdateListFormData = z.infer<typeof updateListFormSchema>
 
 const ListsPage: NextPage = () => {
 	const router = useRouter()
-
-	const { register, handleSubmit, reset } = useForm<CreateListFormData>({
-		defaultValues: {
-			name: '',
-		},
-		resolver: zodResolver(createListFormSchema),
-	})
-
-	const [lists, setLists] = useState<Lists>([])
-	const [isCreatingList, setIsCreatingList] = useState(false)
+	const { lists, addList, updateList } = useLists()
 	const [editingListId, setEditingListId] = useState('')
 	const [deletingListId, setDeletingListId] = useState('')
 	const [isDeleteListDialogOpen, setIsDeleteListDialogOpen] = useState(false)
@@ -57,44 +44,6 @@ const ListsPage: NextPage = () => {
 		},
 		resolver: zodResolver(updateListFormSchema),
 	})
-
-	const loadLists = useCallback(async () => {
-		try {
-			const response = await getAll<Lists>('lists')
-
-			setLists(response)
-		} catch (error) {
-			console.error(error)
-		}
-	}, [])
-
-	const handleShowCreateListForm = useCallback(() => {
-		setIsCreatingList(true)
-	}, [])
-
-	const handleCancelCreateList = useCallback(() => {
-		setIsCreatingList(false)
-		reset()
-	}, [reset])
-
-	const createList = async (data: CreateListFormData) => {
-		try {
-			const item: List = {
-				id: uuidv4(),
-				name: data.name,
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			}
-
-			await save<List>('lists', item)
-
-			setLists((oldLists) => [...oldLists, item])
-
-			handleCancelCreateList()
-		} catch (error) {
-			console.error(error)
-		}
-	}
 
 	const handleEditList = (id: string) => {
 		setEditingListId(id)
@@ -115,9 +64,7 @@ const ListsPage: NextPage = () => {
 				updatedAt: new Date(),
 			}
 
-			await save<List>('lists', updatedList)
-
-			setLists((oldLists) => oldLists.map((list) => (list.id === editingListId ? updatedList : list)))
+			await updateList(updatedList)
 
 			handleCancelEditList()
 			resetUpdate()
@@ -167,9 +114,7 @@ const ListsPage: NextPage = () => {
 
 		const { groceries, ...list } = parsedData
 
-		await save<List>('lists', list)
-
-		setLists((oldLists) => [...oldLists, list])
+		await addList(list)
 
 		for (const grocery of groceries) {
 			await save<GroceryItem>('groceries', grocery)
@@ -178,11 +123,7 @@ const ListsPage: NextPage = () => {
 		toast.success('Sucesso!', {
 			description: 'Lista importada com sucesso!',
 		})
-	}, [setLists])
-
-	useEffect(() => {
-		loadLists()
-	}, [loadLists])
+	}, [addList])
 
 	return (
 		<div>
@@ -198,28 +139,7 @@ const ListsPage: NextPage = () => {
 					</div>
 				</div>
 				<div className="flex flex-col gap-2 mt-6 flex-wrap" onMouseEnter={handleActionMouseLeave}>
-					{!isCreatingList && (
-						<Button variant="outline" className="border-dashed p-4! h-max gap-2" onClick={handleShowCreateListForm}>
-							<ListPlusIcon className="size-4" />
-							Criar nova lista
-						</Button>
-					)}
-					{isCreatingList && (
-						<form
-							className="flex items-center justify-between gap-2 p-2 border rounded border-dashed flex-wrap md:flex-nowrap"
-							onSubmit={handleSubmit(createList)}
-						>
-							<Input placeholder="Digite aqui o nome do item ..." className="border-none" {...register('name')} />
-							<div className="flex items-center gap-2 flex-1 flex-wrap md:flex-nowrap">
-								<Button type="submit" className="flex-1">
-									Adicionar
-								</Button>
-								<Button type="reset" variant="secondary" className="flex-1" onClick={handleCancelCreateList}>
-									Cancelar
-								</Button>
-							</div>
-						</form>
-					)}
+					<CreateListDialog />
 					{lists.map((list) => {
 						const isEditing = list.id === editingListId
 
@@ -316,7 +236,6 @@ const ListsPage: NextPage = () => {
 												<DeleteListDialog
 													isOpen={isDeleteListDialogOpen}
 													listId={list.id}
-													setLists={setLists}
 													onOpenChange={updateDeleteListDialogOpen}
 												/>
 											)}

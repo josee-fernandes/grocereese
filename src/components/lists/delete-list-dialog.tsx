@@ -18,19 +18,19 @@ import {
 	DrawerHeader,
 	DrawerTitle,
 } from '@/components/ui/drawer'
+import { useLists } from '@/hooks/use-lists'
 import { useMediaQuery } from '@/hooks/use-media-query'
-import { destroy } from '@/utils/local'
 
 import { Portal } from '../portal'
 
 interface DeleteListDialogProps {
 	isOpen: boolean
 	listId: string
-	setLists: React.Dispatch<React.SetStateAction<Lists>>
 	onOpenChange: (isOpen: boolean) => void
 }
 
-export const DeleteListDialog: React.FC<DeleteListDialogProps> = ({ isOpen, listId, setLists, onOpenChange }) => {
+export const DeleteListDialog: React.FC<DeleteListDialogProps> = ({ isOpen, listId, onOpenChange }) => {
+	const { removeList } = useLists()
 	const isDesktop = useMediaQuery('(min-width: 768px)')
 
 	const onInteract = () => {
@@ -39,9 +39,7 @@ export const DeleteListDialog: React.FC<DeleteListDialogProps> = ({ isOpen, list
 
 	const handleDeleteList = useCallback(async () => {
 		try {
-			await destroy<List>('lists', listId)
-
-			setLists((oldLists) => oldLists.filter((list) => list.id !== listId))
+			await removeList(listId)
 
 			toast.success('Sucesso!', {
 				description: `Lista removida com sucesso!`,
@@ -49,13 +47,13 @@ export const DeleteListDialog: React.FC<DeleteListDialogProps> = ({ isOpen, list
 		} catch (error) {
 			console.error(error)
 		}
-	}, [listId, setLists])
+	}, [listId, removeList])
 
 	if (isDesktop) {
 		return (
 			<Portal>
 				<Dialog open={isOpen} onOpenChange={onOpenChange}>
-					<DialogContent className="sm:max-w-[425px]">
+					<DialogContent className="sm:max-w-106.25">
 						<DialogHeader>
 							<DialogTitle>Remover lista</DialogTitle>
 							<DialogDescription className="sr-only">
