@@ -7,12 +7,11 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 import { useLists } from '@/hooks/use-lists'
-
-import { Button } from './ui/button'
-import { Field, FieldDescription, FieldGroup, FieldLabel } from './ui/field'
-import { Input } from './ui/input'
 
 const createListFormSchema = z.object({
 	name: z

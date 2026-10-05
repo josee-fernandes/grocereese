@@ -31,7 +31,13 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupButton,
+	InputGroupInput,
+	InputGroupText,
+} from '@/components/ui/input-group'
 import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import { ShineBorder } from '@/components/ui/shine-border'
@@ -442,10 +448,10 @@ const ListPage: NextPage = () => {
 					<div className="flex items-center justify-between gap-2">
 						<div>
 							<InputGroup>
+								<InputGroupInput id="filter-name" placeholder="Pesquisar" {...registerFilter('name')} />
 								<InputGroupAddon align="inline-start">
 									<SearchIcon className="size-4" />
 								</InputGroupAddon>
-								<InputGroupInput id="filter-name" placeholder="Pesquisar" {...registerFilter('name')} />
 							</InputGroup>
 						</div>
 						<div className="flex items-center gap-2">
@@ -484,7 +490,7 @@ const ListPage: NextPage = () => {
 										{
 											'text-emerald-500 opacity-50!': item.caught && item.price > 0 && item.quantity > 0,
 											'text-amber-500 border-amber-500!': item.caught && (item.price === 0 || item.quantity === 0),
-											'border-sky-500': isEditing,
+											'border-accent animate-pulse': isEditing,
 										},
 									)}
 								>
@@ -502,42 +508,45 @@ const ListPage: NextPage = () => {
 										{isEditing ? (
 											<Input placeholder="Nome do item da compra" {...registerUpdate('name')} />
 										) : (
-											<label htmlFor={item.id} className={cn('font-semibold', item.caught && 'line-through')}>
+											<label htmlFor={item.id} className={cn({ 'line-through': item.caught })}>
 												{item.name}
 											</label>
 										)}
 									</div>
-									<div className="flex items-center gap-4 justify-between max-w-96 flex-wrap">
+									<div className="flex items-center gap-2 justify-between max-w-96 flex-wrap">
 										{isEditing ? (
 											<form
-												className="flex items-center gap-4 flex-wrap"
+												className="flex items-center justify-between gap-4 flex-wrap w-full"
 												onSubmit={handleSubmitUpdate(handleUpdateItem)}
 											>
-												<div className="flex items-center gap-4 flex-1 flex-wrap text-center md:text-left">
-													<div className="text-xs flex items-center gap-2 flex-wrap">
-														R$
-														<Input
-															placeholder="Preço"
-															type="number"
+												<div className="flex items-center gap-2 flex-wrap text-center md:text-left">
+													<InputGroup className="w-max">
+														<InputGroupInput
+															placeholder="0,00"
 															min={0}
 															max={99}
 															step={0.01}
 															className="w-14"
 															{...registerUpdate('price', { valueAsNumber: true })}
 														/>
-													</div>
-													<Separator orientation="vertical" className="h-4" />
-													<div className="text-xs flex items-center gap-2 flex-wrap">
-														<Input
-															placeholder="Preço"
+														<InputGroupAddon align="inline-start">
+															<InputGroupText>R$</InputGroupText>
+														</InputGroupAddon>
+													</InputGroup>
+													<Separator orientation="vertical" />
+													<InputGroup className="w-max">
+														<InputGroupInput
+															placeholder="0"
 															type="number"
 															min={0}
 															max={99}
-															className="w-14"
+															className="w-10"
 															{...registerUpdate('quantity', { valueAsNumber: true })}
 														/>
-														unidades
-													</div>
+														<InputGroupAddon align="inline-end">
+															<InputGroupText>unidades</InputGroupText>
+														</InputGroupAddon>
+													</InputGroup>
 												</div>
 												<div className="flex items-center gap-2 flex-wrap">
 													<Button type="submit" variant="outline" size="icon">
@@ -552,9 +561,13 @@ const ListPage: NextPage = () => {
 											<>
 												<div className="flex items-center gap-4 flex-1 flex-wrap text-center md:text-left">
 													<div className="flex items-center gap-4 mr-12 flex-wrap">
-														<span className="text-xs">R$ {item.price.toFixed(2)}</span>
-														<Separator orientation="vertical" className="h-4" />
-														<span className="text-xs">{item.quantity} unidades</span>
+														<span className="text-sm text-muted-foreground">
+															{Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.price)}
+														</span>
+														<Separator orientation="vertical" />
+														<span className="text-sm text-muted-foreground">
+															{item.quantity} {item.quantity === 1 ? 'unidade' : 'unidades'}
+														</span>
 													</div>
 												</div>
 												<Button

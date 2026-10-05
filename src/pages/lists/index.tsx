@@ -135,7 +135,7 @@ const ListsPage: NextPage = () => {
 			<main className="mx-auto max-w-300 w-full px-4 md:px-6 py-10">
 				<div className="flex justify-between items-center gap-4 flex-col md:flex-row flex-wrap">
 					<div className="flex justify-between items-center gap-2 flex-wrap w-full">
-						<h2 className="text-xl font-bold text-center">Listas de compras</h2>
+						<h2 className="text-lg font-bold">Listas de compras</h2>
 						<Button className="gap-2" onClick={handleImportList}>
 							<ImportIcon className="size-4" />
 							Importar lista copiada
@@ -151,8 +151,8 @@ const ListsPage: NextPage = () => {
 							<div
 								key={list.id}
 								className={cn(
-									'group flex items-center justify-between gap-2 p-4 border rounded flex-col md:flex-row hover:bg-accent cursor-pointer transition-all flex-wrap',
-									isEditing && 'border-sky-500',
+									'group flex items-center justify-between gap-2 px-4 py-2 bg-muted border rounded-xl hover:bg-accent cursor-pointer transition-all flex-wrap',
+									{ 'border-accent animate-pulse': isEditing },
 								)}
 								onClick={() => handleRedirectToList(list.id)}
 							>
@@ -166,12 +166,10 @@ const ListsPage: NextPage = () => {
 											{...registerUpdate('name')}
 										/>
 									) : (
-										<label htmlFor={list.id} className="font-semibold">
-											{list.name}
-										</label>
+										<label htmlFor={list.id}>{list.name}</label>
 									)}
 								</div>
-								<div className="flex items-center gap-4 justify-between max-w-96 flex-wrap">
+								<div className="flex items-center gap-2 justify-between max-w-96 flex-wrap">
 									{isEditing ? (
 										<form className="flex items-center gap-2 flex-wrap" onSubmit={handleSubmitUpdate(handleUpdateList)}>
 											<Button
